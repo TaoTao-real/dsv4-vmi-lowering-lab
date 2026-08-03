@@ -1,0 +1,5 @@
+TileLib daemon 'ptodsl.tilelib.serving.daemon' started (pid=30807, socket=/tmp/tilelib_daemon_30804.sock)
+Info: ptodsl TileLib daemon started successfully
+loc("-":21:14): error: 'pto.vbr' op cannot infer resultless pto.vecscope because VPTO vector-scope data cannot have external users; escaping value type is '!pto.vreg<64xf32>'
+Error: VPTO emission pipeline failed.
+TileLib daemon stopped (pid=30807)

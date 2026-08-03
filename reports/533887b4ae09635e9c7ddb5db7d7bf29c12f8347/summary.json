@@ -1,0 +1,46 @@
+{
+  "ptoas_commit": "533887b4ae09635e9c7ddb5db7d7bf29c12f8347",
+  "input_cases": 120,
+  "compile_status": {
+    "PASS": 120
+  },
+  "fusion_assessment": {
+    "fusion_candidate_with_local_boundaries": 62,
+    "hard_boundary_only": 52,
+    "fusion_candidate_clean": 6
+  },
+  "case_families": {
+    "_jit_attention_csa_test_20260723_032646": 47,
+    "_jit_prefill_attention_csa_test_20260723_031246": 53,
+    "_jit_qkv_proj_rope_test_20260723_031029": 9,
+    "_jit_qkv_proj_rope_test_20260723_031234": 9,
+    "_jit_rms_norm_test_20260723_030917": 1,
+    "_jit_rms_norm_test_20260723_030929": 1
+  },
+  "cases_with_residual_vmi_ops": 0,
+  "tileop_instances": 3280,
+  "tileop_kinds": 45,
+  "key_case_classification": {
+    "fragmented_or_unoptimized": 4,
+    "partially_optimized": 4
+  },
+  "fusion_phase_tileop_class": {
+    "hard_boundary": 1486,
+    "local_boundary": 649,
+    "vmi": 1100,
+    "unclassified": 53
+  },
+  "boundary_reasons": {
+    "non_vmi_hard_boundary_fallback": 1486,
+    "non_vmi_local_boundary_fallback": 649
+  },
+  "fusion_region_size_distribution": {
+    "1": 1056
+  },
+  "fusion_region_summary": {
+    "regions": 1056,
+    "singleton_regions": 1056,
+    "singleton_ratio": 1.0,
+    "selected_vmi_outside_regions": 44
+  }
+}

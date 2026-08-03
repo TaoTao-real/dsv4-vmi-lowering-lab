@@ -1,0 +1,16 @@
+{
+  "ptoas_worktree": "/Users/lishengtao/Documents/PTO/PTOAS_vmi_vf_next",
+  "ptoas_commit": "533887b4ae09635e9c7ddb5db7d7bf29c12f8347",
+  "ptoas_binary": "/Users/lishengtao/Documents/PTO/PTOAS_vmi_vf_next/build-llvm21/tools/ptoas/ptoas",
+  "dsv4_root": "/Users/lishengtao/Documents/PTO/_ptoas_tech_lab_materials/datasets/dsv4/build_output",
+  "flags": [
+    "--pto-arch=a5",
+    "--pto-level=level3",
+    "--pto-backend=vpto",
+    "--tile-lib-backend=ptodsl",
+    "--enable-vmi",
+    "--enable-op-fusion",
+    "--emit-vpto"
+  ],
+  "case_count": 120
+}

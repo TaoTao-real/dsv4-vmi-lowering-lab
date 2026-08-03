@@ -1,0 +1,142 @@
+// -----// IR Dump After PTOFusionRegionGen (pto-fusion-region-gen) //----- //
+func.func @q_rope_prepare(%arg0: !pto.ptr<bf16, gm>, %arg1: !pto.ptr<bf16, gm>, %arg2: !pto.ptr<f32, gm>, %arg3: !pto.ptr<f32, gm>, %arg4: !pto.ptr<i32, gm>, %arg5: index, %arg6: i32, %arg7: i32) attributes {pto.kernel_kind = #pto.kernel_kind<vector>} {
+  %c8704_i64 = arith.constant 8704 : i64
+  %c10752_i64 = arith.constant 10752 : i64
+  %c0_i64 = arith.constant 0 : i64
+  %c2048_i64 = arith.constant 2048 : i64
+  %c4096_i64 = arith.constant 4096 : i64
+  %c6144_i64 = arith.constant 6144 : i64
+  %c8192_i64 = arith.constant 8192 : i64
+  %c8448_i64 = arith.constant 8448 : i64
+  %c64 = arith.constant 64 : index
+  %c1 = arith.constant 1 : index
+  %c8 = arith.constant 8 : index
+  %cst = arith.constant 1.000000e+00 : f32
+  %c0_i32 = arith.constant 0 : i32
+  %cst_0 = arith.constant 5.000000e-01 : f32
+  %cst_1 = arith.constant 2.000000e+00 : f32
+  %c0 = arith.constant 0 : index
+  %0 = arith.muli %arg5, %c64 : index
+  %1 = pto.make_tensor_view %arg0, shape = [%c1, %c1, %c1, %arg5, %c64], strides = [%0, %0, %0, %c64, %c1] {layout = #pto.layout<nd>} : !pto.tensor_view<1x1x1x?x?xbf16>
+  %2 = arith.muli %arg5, %c64 : index
+  %3 = pto.make_tensor_view %arg1, shape = [%c1, %c1, %c1, %arg5, %c64], strides = [%2, %2, %2, %c64, %c1] {layout = #pto.layout<nd>} : !pto.tensor_view<1x1x1x?x?xbf16>
+  %4 = arith.muli %arg5, %c64 : index
+  %5 = pto.make_tensor_view %arg2, shape = [%c1, %c1, %c1, %arg5, %c64], strides = [%4, %4, %4, %c64, %c1] {layout = #pto.layout<nd>} : !pto.tensor_view<1x1x1x?x?xf32>
+  %6 = arith.muli %arg5, %c64 : index
+  %7 = pto.make_tensor_view %arg3, shape = [%c1, %c1, %c1, %arg5, %c64], strides = [%6, %6, %6, %c64, %c1] {layout = #pto.layout<nd>} : !pto.tensor_view<1x1x1x?x?xf32>
+  %8 = arith.muli %arg5, %c64 : index
+  %9 = pto.make_tensor_view %arg4, shape = [%c1, %c1, %c1, %arg5, %c64], strides = [%8, %8, %8, %c64, %c1] {layout = #pto.layout<nd>} : !pto.tensor_view<1x1x1x?x?xi32>
+  %10 = arith.index_cast %arg6 : i32 to index
+  %11 = arith.muli %10, %c8 : index
+  %12 = pto.alloc_tile addr = %c8704_i64 valid_row = %c8 valid_col = %c64 : !pto.tile_buf<vec, 8x64xf32, valid=?x?>
+  pto.texpands ins(%cst : f32) outs(%12 : !pto.tile_buf<vec, 8x64xf32, valid=?x?>) {candidates = [{id = 0 : i64, loop_depth = 2 : i64, name = "template_texpands", postupdate = 0 : i64, tags = ["elementwise", "scalar", "fill"], tail = 0 : i64}], pto.tilelib.impl = "ptodsl", pto.tilelib.selected_candidate = {id = 0 : i64, loop_depth = 2 : i64, name = "template_texpands", postupdate = 0 : i64, tags = ["elementwise", "scalar", "fill"], tail = 0 : i64}, pto.vmi.fusion.boundary = "local", pto.vmi.fusion.boundary_reason = "non_vmi_local_boundary_fallback"}
+  %13 = pto.alloc_tile addr = %c10752_i64 valid_row = %c1 valid_col = %c64 : !pto.tile_buf<vec, 1x64xi32, valid=?x?>
+  pto.tci ins(%c0_i32 : i32) outs(%13 : !pto.tile_buf<vec, 1x64xi32, valid=?x?>) {candidates = [{id = 0 : i64, loop_depth = 1 : i64, name = "template_tci", postupdate = 0 : i64, tags = [], tail = 0 : i64}], descending = false, pto.tilelib.impl = "ptodsl", pto.tilelib.selected_candidate = {id = 0 : i64, loop_depth = 1 : i64, name = "template_tci", postupdate = 0 : i64, tags = [], tail = 0 : i64}, pto.vmi.fusion.boundary = "hard", pto.vmi.fusion.boundary_reason = "non_vmi_hard_boundary_fallback"}
+  %14 = pto.alloc_tile addr = %c10752_i64 valid_row = %c1 valid_col = %c64 : !pto.tile_buf<vec, 1x64xf32, valid=?x?>
+  pto.tcvt ins(%13 {candidates = [{id = 1 : i64, loop_depth = 2 : i64, name = "template_tcvt_i32_to_f32", postupdate = 0 : i64, tags = ["convert", "rowwise"], tail = 0 : i64}], pto.tilelib.impl = "ptodsl", pto.tilelib.selected_candidate = {id = 1 : i64, loop_depth = 2 : i64, name = "template_tcvt_i32_to_f32", postupdate = 0 : i64, tags = ["convert", "rowwise"], tail = 0 : i64}, pto.vmi.fusion.boundary = "local", pto.vmi.fusion.boundary_reason = "non_vmi_local_boundary_fallback", rmode = #pto<round_mode ROUND>, satmode = #pto<saturation_mode OFF>} : !pto.tile_buf<vec, 1x64xi32, valid=?x?>) outs(%14 : !pto.tile_buf<vec, 1x64xf32, valid=?x?>)
+  %15 = pto.fusion_region {
+    %42 = pto.alloc_tile addr = %c8704_i64 valid_row = %c8 valid_col = %c64 : !pto.tile_buf<vec, 8x64xf32, valid=?x?>
+    pto.tcolexpandmul ins(%12, %14 : !pto.tile_buf<vec, 8x64xf32, valid=?x?>, !pto.tile_buf<vec, 1x64xf32, valid=?x?>) outs(%42 : !pto.tile_buf<vec, 8x64xf32, valid=?x?>) {candidates = [{id = 0 : i64, loop_depth = 2 : i64, name = "template_tcolexpandmul", postupdate = 0 : i64, tags = ["column_expand", "binary"], tail = 0 : i64}, {id = 1000 : i64, loop_depth = 1 : i64, name = "vmi_tcolexpandmul", postupdate = 0 : i64, tags = ["vmi", "fusion_eligible", "single_logical_row_loop"], tail = 0 : i64}], pto.tilelib.impl = "vmi", pto.tilelib.selected_candidate = {id = 1000 : i64, loop_depth = 1 : i64, name = "vmi_tcolexpandmul", postupdate = 0 : i64, tags = ["vmi", "fusion_eligible", "single_logical_row_loop"], tail = 0 : i64}}
+    pto.yield(%42) : (!pto.tile_buf<vec, 8x64xf32, valid=?x?>) -> ()
+  } {pto.fusion.group_id = 0 : i64} : !pto.tile_buf<vec, 8x64xf32, valid=?x?>
+  %16 = pto.fusion_region {
+    %42 = pto.alloc_tile addr = %c10752_i64 valid_row = %c8 valid_col = %c64 : !pto.tile_buf<vec, 8x64xf32, valid=?x?>
+    pto.tmuls ins(%15, %cst_0 : !pto.tile_buf<vec, 8x64xf32, valid=?x?>, f32) outs(%42 : !pto.tile_buf<vec, 8x64xf32, valid=?x?>) {candidates = [{id = 0 : i64, loop_depth = 2 : i64, name = "template_tmuls", postupdate = 0 : i64, tags = ["elementwise", "scalar"], tail = 0 : i64}, {id = 1000 : i64, loop_depth = 1 : i64, name = "vmi_tmuls", postupdate = 0 : i64, tags = ["vmi", "fusion_eligible", "single_logical_row_loop"], tail = 0 : i64}], pto.tilelib.impl = "vmi", pto.tilelib.selected_candidate = {id = 1000 : i64, loop_depth = 1 : i64, name = "vmi_tmuls", postupdate = 0 : i64, tags = ["vmi", "fusion_eligible", "single_logical_row_loop"], tail = 0 : i64}}
+    pto.yield(%42) : (!pto.tile_buf<vec, 8x64xf32, valid=?x?>) -> ()
+  } {pto.fusion.group_id = 1 : i64} : !pto.tile_buf<vec, 8x64xf32, valid=?x?>
+  %17 = pto.alloc_tile addr = %c10752_i64 valid_row = %c8 valid_col = %c64 : !pto.tile_buf<vec, 8x64xi32, valid=?x?>
+  pto.tcvt ins(%16 {candidates = [{id = 0 : i64, loop_depth = 2 : i64, name = "template_tcvt_f32_to_i32", postupdate = 0 : i64, tags = ["convert", "rowwise"], tail = 0 : i64}], pto.tilelib.impl = "ptodsl", pto.tilelib.selected_candidate = {id = 0 : i64, loop_depth = 2 : i64, name = "template_tcvt_f32_to_i32", postupdate = 0 : i64, tags = ["convert", "rowwise"], tail = 0 : i64}, pto.vmi.fusion.boundary = "local", pto.vmi.fusion.boundary_reason = "non_vmi_local_boundary_fallback", rmode = #pto<round_mode TRUNC>, satmode = #pto<saturation_mode OFF>} : !pto.tile_buf<vec, 8x64xf32, valid=?x?>) outs(%17 : !pto.tile_buf<vec, 8x64xi32, valid=?x?>)
+  %18 = pto.alloc_tile addr = %c10752_i64 valid_row = %c8 valid_col = %c64 : !pto.tile_buf<vec, 8x64xf32, valid=?x?>
+  pto.tcvt ins(%17 {candidates = [{id = 1 : i64, loop_depth = 2 : i64, name = "template_tcvt_i32_to_f32", postupdate = 0 : i64, tags = ["convert", "rowwise"], tail = 0 : i64}], pto.tilelib.impl = "ptodsl", pto.tilelib.selected_candidate = {id = 1 : i64, loop_depth = 2 : i64, name = "template_tcvt_i32_to_f32", postupdate = 0 : i64, tags = ["convert", "rowwise"], tail = 0 : i64}, pto.vmi.fusion.boundary = "local", pto.vmi.fusion.boundary_reason = "non_vmi_local_boundary_fallback", rmode = #pto<round_mode ROUND>, satmode = #pto<saturation_mode OFF>} : !pto.tile_buf<vec, 8x64xi32, valid=?x?>) outs(%18 : !pto.tile_buf<vec, 8x64xf32, valid=?x?>)
+  %19 = pto.alloc_tile addr = %c0_i64 valid_row = %c8 valid_col = %c64 : !pto.tile_buf<vec, 8x64xi32, valid=?x?>
+  pto.tcvt ins(%18 {candidates = [{id = 0 : i64, loop_depth = 2 : i64, name = "template_tcvt_f32_to_i32", postupdate = 0 : i64, tags = ["convert", "rowwise"], tail = 0 : i64}], pto.tilelib.impl = "ptodsl", pto.tilelib.selected_candidate = {id = 0 : i64, loop_depth = 2 : i64, name = "template_tcvt_f32_to_i32", postupdate = 0 : i64, tags = ["convert", "rowwise"], tail = 0 : i64}, pto.vmi.fusion.boundary = "local", pto.vmi.fusion.boundary_reason = "non_vmi_local_boundary_fallback", rmode = #pto<round_mode ROUND>, satmode = #pto<saturation_mode OFF>} : !pto.tile_buf<vec, 8x64xf32, valid=?x?>) outs(%19 : !pto.tile_buf<vec, 8x64xi32, valid=?x?>)
+  %20 = pto.fusion_region {
+    %42 = pto.alloc_tile addr = %c10752_i64 valid_row = %c8 valid_col = %c64 : !pto.tile_buf<vec, 8x64xf32, valid=?x?>
+    pto.tmuls ins(%18, %cst_1 : !pto.tile_buf<vec, 8x64xf32, valid=?x?>, f32) outs(%42 : !pto.tile_buf<vec, 8x64xf32, valid=?x?>) {candidates = [{id = 0 : i64, loop_depth = 2 : i64, name = "template_tmuls", postupdate = 0 : i64, tags = ["elementwise", "scalar"], tail = 0 : i64}, {id = 1000 : i64, loop_depth = 1 : i64, name = "vmi_tmuls", postupdate = 0 : i64, tags = ["vmi", "fusion_eligible", "single_logical_row_loop"], tail = 0 : i64}], pto.tilelib.impl = "vmi", pto.tilelib.selected_candidate = {id = 1000 : i64, loop_depth = 1 : i64, name = "vmi_tmuls", postupdate = 0 : i64, tags = ["vmi", "fusion_eligible", "single_logical_row_loop"], tail = 0 : i64}}
+    pto.yield(%42) : (!pto.tile_buf<vec, 8x64xf32, valid=?x?>) -> ()
+  } {pto.fusion.group_id = 2 : i64} : !pto.tile_buf<vec, 8x64xf32, valid=?x?>
+  %21 = pto.fusion_region {
+    %42 = pto.alloc_tile addr = %c10752_i64 valid_row = %c8 valid_col = %c64 : !pto.tile_buf<vec, 8x64xf32, valid=?x?>
+    pto.tsub ins(%15, %20 : !pto.tile_buf<vec, 8x64xf32, valid=?x?>, !pto.tile_buf<vec, 8x64xf32, valid=?x?>) outs(%42 : !pto.tile_buf<vec, 8x64xf32, valid=?x?>) {candidates = [{id = 0 : i64, loop_depth = 2 : i64, name = "template_tsub", postupdate = 0 : i64, tags = ["elementwise", "binary"], tail = 0 : i64}, {id = 1000 : i64, loop_depth = 1 : i64, name = "vmi_tsub", postupdate = 0 : i64, tags = ["vmi", "fusion_eligible", "single_logical_row_loop"], tail = 0 : i64}], pto.tilelib.impl = "vmi", pto.tilelib.selected_candidate = {id = 1000 : i64, loop_depth = 1 : i64, name = "vmi_tsub", postupdate = 0 : i64, tags = ["vmi", "fusion_eligible", "single_logical_row_loop"], tail = 0 : i64}}
+    pto.yield(%42) : (!pto.tile_buf<vec, 8x64xf32, valid=?x?>) -> ()
+  } {pto.fusion.group_id = 3 : i64} : !pto.tile_buf<vec, 8x64xf32, valid=?x?>
+  %22 = pto.fusion_region {
+    %42 = pto.alloc_tile addr = %c8704_i64 valid_row = %c8 valid_col = %c64 : !pto.tile_buf<vec, 8x64xf32, valid=?x?>
+    pto.tadds ins(%15, %cst : !pto.tile_buf<vec, 8x64xf32, valid=?x?>, f32) outs(%42 : !pto.tile_buf<vec, 8x64xf32, valid=?x?>) {candidates = [{id = 0 : i64, loop_depth = 2 : i64, name = "template_tadds", postupdate = 0 : i64, tags = ["elementwise", "scalar"], tail = 0 : i64}, {id = 1000 : i64, loop_depth = 1 : i64, name = "vmi_tadds", postupdate = 0 : i64, tags = ["vmi", "fusion_eligible", "single_logical_row_loop"], tail = 0 : i64}], pto.tilelib.impl = "vmi", pto.tilelib.selected_candidate = {id = 1000 : i64, loop_depth = 1 : i64, name = "vmi_tadds", postupdate = 0 : i64, tags = ["vmi", "fusion_eligible", "single_logical_row_loop"], tail = 0 : i64}}
+    pto.yield(%42) : (!pto.tile_buf<vec, 8x64xf32, valid=?x?>) -> ()
+  } {pto.fusion.group_id = 4 : i64} : !pto.tile_buf<vec, 8x64xf32, valid=?x?>
+  %23 = pto.fusion_region {
+    %42 = pto.alloc_tile addr = %c2048_i64 valid_row = %c8 valid_col = %c64 : !pto.tile_buf<vec, 8x64xf32, valid=?x?>
+    pto.tmuls ins(%21, %cst_1 : !pto.tile_buf<vec, 8x64xf32, valid=?x?>, f32) outs(%42 : !pto.tile_buf<vec, 8x64xf32, valid=?x?>) {candidates = [{id = 0 : i64, loop_depth = 2 : i64, name = "template_tmuls", postupdate = 0 : i64, tags = ["elementwise", "scalar"], tail = 0 : i64}, {id = 1000 : i64, loop_depth = 1 : i64, name = "vmi_tmuls", postupdate = 0 : i64, tags = ["vmi", "fusion_eligible", "single_logical_row_loop"], tail = 0 : i64}], pto.tilelib.impl = "vmi", pto.tilelib.selected_candidate = {id = 1000 : i64, loop_depth = 1 : i64, name = "vmi_tmuls", postupdate = 0 : i64, tags = ["vmi", "fusion_eligible", "single_logical_row_loop"], tail = 0 : i64}}
+    pto.yield(%42) : (!pto.tile_buf<vec, 8x64xf32, valid=?x?>) -> ()
+  } {pto.fusion.group_id = 5 : i64} : !pto.tile_buf<vec, 8x64xf32, valid=?x?>
+  %24 = pto.fusion_region {
+    %42 = pto.alloc_tile addr = %c8704_i64 valid_row = %c8 valid_col = %c64 : !pto.tile_buf<vec, 8x64xf32, valid=?x?>
+    pto.tsub ins(%22, %23 : !pto.tile_buf<vec, 8x64xf32, valid=?x?>, !pto.tile_buf<vec, 8x64xf32, valid=?x?>) outs(%42 : !pto.tile_buf<vec, 8x64xf32, valid=?x?>) {candidates = [{id = 0 : i64, loop_depth = 2 : i64, name = "template_tsub", postupdate = 0 : i64, tags = ["elementwise", "binary"], tail = 0 : i64}, {id = 1000 : i64, loop_depth = 1 : i64, name = "vmi_tsub", postupdate = 0 : i64, tags = ["vmi", "fusion_eligible", "single_logical_row_loop"], tail = 0 : i64}], pto.tilelib.impl = "vmi", pto.tilelib.selected_candidate = {id = 1000 : i64, loop_depth = 1 : i64, name = "vmi_tsub", postupdate = 0 : i64, tags = ["vmi", "fusion_eligible", "single_logical_row_loop"], tail = 0 : i64}}
+    pto.yield(%42) : (!pto.tile_buf<vec, 8x64xf32, valid=?x?>) -> ()
+  } {pto.fusion.group_id = 6 : i64} : !pto.tile_buf<vec, 8x64xf32, valid=?x?>
+  %25 = pto.alloc_tile addr = %c8704_i64 valid_row = %c8 valid_col = %c64 : !pto.tile_buf<vec, 8x64xi32, valid=?x?>
+  pto.tcvt ins(%24 {candidates = [{id = 0 : i64, loop_depth = 2 : i64, name = "template_tcvt_f32_to_i32", postupdate = 0 : i64, tags = ["convert", "rowwise"], tail = 0 : i64}], pto.tilelib.impl = "ptodsl", pto.tilelib.selected_candidate = {id = 0 : i64, loop_depth = 2 : i64, name = "template_tcvt_f32_to_i32", postupdate = 0 : i64, tags = ["convert", "rowwise"], tail = 0 : i64}, pto.vmi.fusion.boundary = "local", pto.vmi.fusion.boundary_reason = "non_vmi_local_boundary_fallback", rmode = #pto<round_mode ROUND>, satmode = #pto<saturation_mode OFF>} : !pto.tile_buf<vec, 8x64xf32, valid=?x?>) outs(%25 : !pto.tile_buf<vec, 8x64xi32, valid=?x?>)
+  %26 = pto.fusion_region {
+    %42 = pto.alloc_tile addr = %c10752_i64 valid_row = %c8 valid_col = %c64 : !pto.tile_buf<vec, 8x64xf32, valid=?x?>
+    pto.tmuls ins(%21, %cst_1 : !pto.tile_buf<vec, 8x64xf32, valid=?x?>, f32) outs(%42 : !pto.tile_buf<vec, 8x64xf32, valid=?x?>) {candidates = [{id = 0 : i64, loop_depth = 2 : i64, name = "template_tmuls", postupdate = 0 : i64, tags = ["elementwise", "scalar"], tail = 0 : i64}, {id = 1000 : i64, loop_depth = 1 : i64, name = "vmi_tmuls", postupdate = 0 : i64, tags = ["vmi", "fusion_eligible", "single_logical_row_loop"], tail = 0 : i64}], pto.tilelib.impl = "vmi", pto.tilelib.selected_candidate = {id = 1000 : i64, loop_depth = 1 : i64, name = "vmi_tmuls", postupdate = 0 : i64, tags = ["vmi", "fusion_eligible", "single_logical_row_loop"], tail = 0 : i64}}
+    pto.yield(%42) : (!pto.tile_buf<vec, 8x64xf32, valid=?x?>) -> ()
+  } {pto.fusion.group_id = 7 : i64} : !pto.tile_buf<vec, 8x64xf32, valid=?x?>
+  %27 = pto.alloc_tile addr = %c10752_i64 valid_row = %c8 valid_col = %c64 : !pto.tile_buf<vec, 8x64xf32, valid=?x?>
+  pto.tsubs ins(%26, %cst : !pto.tile_buf<vec, 8x64xf32, valid=?x?>, f32) outs(%27 : !pto.tile_buf<vec, 8x64xf32, valid=?x?>) {candidates = [{id = 0 : i64, loop_depth = 2 : i64, name = "template_tsubs", postupdate = 0 : i64, tags = ["elementwise", "scalar"], tail = 0 : i64}], pto.tilelib.impl = "ptodsl", pto.tilelib.selected_candidate = {id = 0 : i64, loop_depth = 2 : i64, name = "template_tsubs", postupdate = 0 : i64, tags = ["elementwise", "scalar"], tail = 0 : i64}, pto.vmi.fusion.boundary = "local", pto.vmi.fusion.boundary_reason = "non_vmi_local_boundary_fallback"}
+  %28 = pto.alloc_tile addr = %c4096_i64 valid_row = %c8 valid_col = %c64 : !pto.tile_buf<vec, 8x64xbf16, valid=?x?>
+  %29 = pto.partition_view %1, offsets = [%c0, %c0, %c0, %11, %c0], sizes = [%c1, %c1, %c1, %c8, %c64] : !pto.tensor_view<1x1x1x?x?xbf16>
+  pto.tload ins(%29 : !pto.partition_tensor_view<1x1x1x8x64xbf16>) outs(%28 : !pto.tile_buf<vec, 8x64xbf16, valid=?x?>) {candidates = [{id = 0 : i64, loop_depth = 3 : i64, name = "template_tload_nd2nd", postupdate = 0 : i64, tags = ["load", "gm", "ub", "nd"], tail = 0 : i64}], layout = #pto.layout<nd>, pto.tilelib.impl = "ptodsl", pto.tilelib.selected_candidate = {id = 0 : i64, loop_depth = 3 : i64, name = "template_tload_nd2nd", postupdate = 0 : i64, tags = ["load", "gm", "ub", "nd"], tail = 0 : i64}, pto.vmi.fusion.boundary = "hard", pto.vmi.fusion.boundary_reason = "non_vmi_hard_boundary_fallback"}
+  %30 = pto.alloc_tile addr = %c6144_i64 valid_row = %c8 valid_col = %c64 : !pto.tile_buf<vec, 8x64xbf16, valid=?x?>
+  %31 = pto.partition_view %3, offsets = [%c0, %c0, %c0, %11, %c0], sizes = [%c1, %c1, %c1, %c8, %c64] : !pto.tensor_view<1x1x1x?x?xbf16>
+  pto.tload ins(%31 : !pto.partition_tensor_view<1x1x1x8x64xbf16>) outs(%30 : !pto.tile_buf<vec, 8x64xbf16, valid=?x?>) {candidates = [{id = 0 : i64, loop_depth = 3 : i64, name = "template_tload_nd2nd", postupdate = 0 : i64, tags = ["load", "gm", "ub", "nd"], tail = 0 : i64}], layout = #pto.layout<nd>, pto.tilelib.impl = "ptodsl", pto.tilelib.selected_candidate = {id = 0 : i64, loop_depth = 3 : i64, name = "template_tload_nd2nd", postupdate = 0 : i64, tags = ["load", "gm", "ub", "nd"], tail = 0 : i64}, pto.vmi.fusion.boundary = "hard", pto.vmi.fusion.boundary_reason = "non_vmi_hard_boundary_fallback"}
+  %32 = pto.alloc_tile addr = %c2048_i64 valid_row = %c8 valid_col = %c64 : !pto.tile_buf<vec, 8x64xf32, valid=?x?>
+  pto.tcvt ins(%28 {candidates = [{id = 20 : i64, loop_depth = 2 : i64, name = "template_tcvt_bf16_to_f32", postupdate = 0 : i64, tags = ["convert", "rowwise"], tail = 0 : i64}], pto.tilelib.impl = "ptodsl", pto.tilelib.selected_candidate = {id = 20 : i64, loop_depth = 2 : i64, name = "template_tcvt_bf16_to_f32", postupdate = 0 : i64, tags = ["convert", "rowwise"], tail = 0 : i64}, pto.vmi.fusion.boundary = "local", pto.vmi.fusion.boundary_reason = "non_vmi_local_boundary_fallback", rmode = #pto<round_mode ROUND>, satmode = #pto<saturation_mode OFF>} : !pto.tile_buf<vec, 8x64xbf16, valid=?x?>) outs(%32 : !pto.tile_buf<vec, 8x64xf32, valid=?x?>)
+  %33 = pto.alloc_tile addr = %c4096_i64 valid_row = %c8 valid_col = %c64 : !pto.tile_buf<vec, 8x64xf32, valid=?x?>
+  pto.tcvt ins(%30 {candidates = [{id = 20 : i64, loop_depth = 2 : i64, name = "template_tcvt_bf16_to_f32", postupdate = 0 : i64, tags = ["convert", "rowwise"], tail = 0 : i64}], pto.tilelib.impl = "ptodsl", pto.tilelib.selected_candidate = {id = 20 : i64, loop_depth = 2 : i64, name = "template_tcvt_bf16_to_f32", postupdate = 0 : i64, tags = ["convert", "rowwise"], tail = 0 : i64}, pto.vmi.fusion.boundary = "local", pto.vmi.fusion.boundary_reason = "non_vmi_local_boundary_fallback", rmode = #pto<round_mode ROUND>, satmode = #pto<saturation_mode OFF>} : !pto.tile_buf<vec, 8x64xbf16, valid=?x?>) outs(%33 : !pto.tile_buf<vec, 8x64xf32, valid=?x?>)
+  %34 = pto.alloc_tile addr = %c6144_i64 valid_row = %c8 valid_col = %c64 : !pto.tile_buf<vec, 8x64xf32, valid=?x?>
+  scf.for %arg8 = %c0 to %c8 step %c1 {
+    %42 = pto.alloc_tile addr = %c2048_i64 valid_row = %c1 valid_col = %c64 : !pto.tile_buf<vec, 1x64xf32, valid=?x?>
+    %43 = pto.subview %32[%arg8, %c0] sizes [1, 64] valid [%c1, %c64] : !pto.tile_buf<vec, 8x64xf32, valid=?x?> -> !pto.tile_buf<vec, 1x64xf32>
+    %44 = pto.alloc_tile addr = %c0_i64 valid_row = %c1 valid_col = %c64 : !pto.tile_buf<vec, 1x64xi32, valid=?x?>
+    %45 = pto.subview %19[%arg8, %c0] sizes [1, 64] valid [%c1, %c64] : !pto.tile_buf<vec, 8x64xi32, valid=?x?> -> !pto.tile_buf<vec, 1x64xi32>
+    %46 = pto.alloc_tile addr = %c8192_i64 valid_row = %c1 valid_col = %c64 : !pto.tile_buf<vec, 1x64xi32, valid=?x?>
+    %47 = pto.alloc_tile addr = %c8448_i64 valid_row = %c1 valid_col = %c64 : !pto.tile_buf<vec, 1x64xf32, valid=?x?>
+    pto.tgather ins(%43, %45, %46 : !pto.tile_buf<vec, 1x64xf32>, !pto.tile_buf<vec, 1x64xi32>, !pto.tile_buf<vec, 1x64xi32, valid=?x?>) outs(%47 : !pto.tile_buf<vec, 1x64xf32, valid=?x?>) {candidates = [{id = 0 : i64, loop_depth = 2 : i64, name = "template_tgather_index", postupdate = 0 : i64, tags = ["gather", "index", "hard_boundary"], tail = 0 : i64}], pto.tilelib.impl = "ptodsl", pto.tilelib.selected_candidate = {id = 0 : i64, loop_depth = 2 : i64, name = "template_tgather_index", postupdate = 0 : i64, tags = ["gather", "index", "hard_boundary"], tail = 0 : i64}, pto.vmi.fusion.boundary = "hard", pto.vmi.fusion.boundary_reason = "non_vmi_hard_boundary_fallback"}
+    %48 = pto.subview %34[%arg8, %c0] sizes [1, 64] valid [%c1, %c64] : !pto.tile_buf<vec, 8x64xf32, valid=?x?> -> !pto.tile_buf<vec, 1x64xf32>
+    pto.fusion_region {
+      pto.tmov ins(%47 : !pto.tile_buf<vec, 1x64xf32, valid=?x?>) outs(%48 : !pto.tile_buf<vec, 1x64xf32>) {candidates = [{id = 0 : i64, loop_depth = 2 : i64, name = "template_tmov_basic", postupdate = 0 : i64, tags = ["move", "ub", "ub"], tail = 0 : i64}, {id = 1000 : i64, loop_depth = 1 : i64, name = "vmi_tmov", postupdate = 0 : i64, tags = ["vmi", "fusion_eligible", "single_logical_row_loop", "supports_partial_valid_shape"], tail = 0 : i64}], pto.tilelib.impl = "vmi", pto.tilelib.selected_candidate = {id = 1000 : i64, loop_depth = 1 : i64, name = "vmi_tmov", postupdate = 0 : i64, tags = ["vmi", "fusion_eligible", "single_logical_row_loop", "supports_partial_valid_shape"], tail = 0 : i64}}
+      pto.yield() : () -> ()
+    } {pto.fusion.group_id = 9 : i64} : 
+  }
+  %35 = pto.alloc_tile addr = %c6144_i64 valid_row = %c8 valid_col = %c64 : !pto.tile_buf<vec, 8x64xf32, valid=?x?>
+  %36 = pto.alloc_tile addr = %c2048_i64 valid_row = %c8 valid_col = %c64 : !pto.tile_buf<vec, 8x64xf32, valid=?x?>
+  scf.for %arg8 = %c0 to %c8 step %c1 {
+    %42 = pto.alloc_tile addr = %c4096_i64 valid_row = %c1 valid_col = %c64 : !pto.tile_buf<vec, 1x64xf32, valid=?x?>
+    %43 = pto.subview %33[%arg8, %c0] sizes [1, 64] valid [%c1, %c64] : !pto.tile_buf<vec, 8x64xf32, valid=?x?> -> !pto.tile_buf<vec, 1x64xf32>
+    %44 = pto.alloc_tile addr = %c0_i64 valid_row = %c1 valid_col = %c64 : !pto.tile_buf<vec, 1x64xi32, valid=?x?>
+    %45 = pto.subview %19[%arg8, %c0] sizes [1, 64] valid [%c1, %c64] : !pto.tile_buf<vec, 8x64xi32, valid=?x?> -> !pto.tile_buf<vec, 1x64xi32>
+    %46 = pto.alloc_tile addr = %c8192_i64 valid_row = %c1 valid_col = %c64 : !pto.tile_buf<vec, 1x64xi32, valid=?x?>
+    %47 = pto.alloc_tile addr = %c8448_i64 valid_row = %c1 valid_col = %c64 : !pto.tile_buf<vec, 1x64xf32, valid=?x?>
+    pto.tgather ins(%43, %45, %46 : !pto.tile_buf<vec, 1x64xf32>, !pto.tile_buf<vec, 1x64xi32>, !pto.tile_buf<vec, 1x64xi32, valid=?x?>) outs(%47 : !pto.tile_buf<vec, 1x64xf32, valid=?x?>) {candidates = [{id = 0 : i64, loop_depth = 2 : i64, name = "template_tgather_index", postupdate = 0 : i64, tags = ["gather", "index", "hard_boundary"], tail = 0 : i64}], pto.tilelib.impl = "ptodsl", pto.tilelib.selected_candidate = {id = 0 : i64, loop_depth = 2 : i64, name = "template_tgather_index", postupdate = 0 : i64, tags = ["gather", "index", "hard_boundary"], tail = 0 : i64}, pto.vmi.fusion.boundary = "hard", pto.vmi.fusion.boundary_reason = "non_vmi_hard_boundary_fallback"}
+    %48 = pto.subview %36[%arg8, %c0] sizes [1, 64] valid [%c1, %c64] : !pto.tile_buf<vec, 8x64xf32, valid=?x?> -> !pto.tile_buf<vec, 1x64xf32>
+    pto.fusion_region {
+      pto.tmov ins(%47 : !pto.tile_buf<vec, 1x64xf32, valid=?x?>) outs(%48 : !pto.tile_buf<vec, 1x64xf32>) {candidates = [{id = 0 : i64, loop_depth = 2 : i64, name = "template_tmov_basic", postupdate = 0 : i64, tags = ["move", "ub", "ub"], tail = 0 : i64}, {id = 1000 : i64, loop_depth = 1 : i64, name = "vmi_tmov", postupdate = 0 : i64, tags = ["vmi", "fusion_eligible", "single_logical_row_loop", "supports_partial_valid_shape"], tail = 0 : i64}], pto.tilelib.impl = "vmi", pto.tilelib.selected_candidate = {id = 1000 : i64, loop_depth = 1 : i64, name = "vmi_tmov", postupdate = 0 : i64, tags = ["vmi", "fusion_eligible", "single_logical_row_loop", "supports_partial_valid_shape"], tail = 0 : i64}}
+      pto.yield() : () -> ()
+    } {pto.fusion.group_id = 10 : i64} : 
+  }
+  %37 = pto.alloc_tile addr = %c2048_i64 valid_row = %c8 valid_col = %c64 : !pto.tile_buf<vec, 8x64xf32, valid=?x?>
+  %38 = pto.fusion_region {
+    %42 = pto.alloc_tile addr = %c10752_i64 valid_row = %c8 valid_col = %c64 : !pto.tile_buf<vec, 8x64xf32, valid=?x?>
+    pto.tmul ins(%37, %27 : !pto.tile_buf<vec, 8x64xf32, valid=?x?>, !pto.tile_buf<vec, 8x64xf32, valid=?x?>) outs(%42 : !pto.tile_buf<vec, 8x64xf32, valid=?x?>) {candidates = [{id = 0 : i64, loop_depth = 2 : i64, name = "template_tmul", postupdate = 0 : i64, tags = ["elementwise", "binary"], tail = 0 : i64}, {id = 1000 : i64, loop_depth = 1 : i64, name = "vmi_tmul", postupdate = 0 : i64, tags = ["vmi", "fusion_eligible", "single_logical_row_loop"], tail = 0 : i64}], pto.tilelib.impl = "vmi", pto.tilelib.selected_candidate = {id = 1000 : i64, loop_depth = 1 : i64, name = "vmi_tmul", postupdate = 0 : i64, tags = ["vmi", "fusion_eligible", "single_logical_row_loop"], tail = 0 : i64}}
+    pto.yield(%42) : (!pto.tile_buf<vec, 8x64xf32, valid=?x?>) -> ()
+  } {pto.fusion.group_id = 8 : i64} : !pto.tile_buf<vec, 8x64xf32, valid=?x?>
+  %39 = pto.partition_view %5, offsets = [%c0, %c0, %c0, %11, %c0], sizes = [%c1, %c1, %c1, %c8, %c64] : !pto.tensor_view<1x1x1x?x?xf32>
+  pto.tstore ins(%35 : !pto.tile_buf<vec, 8x64xf32, valid=?x?>) outs(%39 : !pto.partition_tensor_view<1x1x1x8x64xf32>) {candidates = [{id = 0 : i64, loop_depth = 3 : i64, name = "template_tstore_nd", postupdate = 0 : i64, tags = ["store", "ub", "gm", "nd"], tail = 0 : i64}], layout = #pto.layout<nd>, pto.tilelib.impl = "ptodsl", pto.tilelib.selected_candidate = {id = 0 : i64, loop_depth = 3 : i64, name = "template_tstore_nd", postupdate = 0 : i64, tags = ["store", "ub", "gm", "nd"], tail = 0 : i64}, pto.vmi.fusion.boundary = "hard", pto.vmi.fusion.boundary_reason = "non_vmi_hard_boundary_fallback"}
+  %40 = pto.partition_view %7, offsets = [%c0, %c0, %c0, %11, %c0], sizes = [%c1, %c1, %c1, %c8, %c64] : !pto.tensor_view<1x1x1x?x?xf32>
+  pto.tstore ins(%38 : !pto.tile_buf<vec, 8x64xf32, valid=?x?>) outs(%40 : !pto.partition_tensor_view<1x1x1x8x64xf32>) {candidates = [{id = 0 : i64, loop_depth = 3 : i64, name = "template_tstore_nd", postupdate = 0 : i64, tags = ["store", "ub", "gm", "nd"], tail = 0 : i64}], layout = #pto.layout<nd>, pto.tilelib.impl = "ptodsl", pto.tilelib.selected_candidate = {id = 0 : i64, loop_depth = 3 : i64, name = "template_tstore_nd", postupdate = 0 : i64, tags = ["store", "ub", "gm", "nd"], tail = 0 : i64}, pto.vmi.fusion.boundary = "hard", pto.vmi.fusion.boundary_reason = "non_vmi_hard_boundary_fallback"}
+  %41 = pto.partition_view %9, offsets = [%c0, %c0, %c0, %11, %c0], sizes = [%c1, %c1, %c1, %c8, %c64] : !pto.tensor_view<1x1x1x?x?xi32>
+  pto.tstore ins(%25 : !pto.tile_buf<vec, 8x64xi32, valid=?x?>) outs(%41 : !pto.partition_tensor_view<1x1x1x8x64xi32>) {candidates = [{id = 0 : i64, loop_depth = 3 : i64, name = "template_tstore_nd", postupdate = 0 : i64, tags = ["store", "ub", "gm", "nd"], tail = 0 : i64}], layout = #pto.layout<nd>, pto.tilelib.impl = "ptodsl", pto.tilelib.selected_candidate = {id = 0 : i64, loop_depth = 3 : i64, name = "template_tstore_nd", postupdate = 0 : i64, tags = ["store", "ub", "gm", "nd"], tail = 0 : i64}, pto.vmi.fusion.boundary = "hard", pto.vmi.fusion.boundary_reason = "non_vmi_hard_boundary_fallback"}
+  return
+}
+

@@ -16,6 +16,15 @@
 RMSNorm、RoPE 保证 lowering 和正确性回归；深融合为次级目标。动态 tail/mask、
 high-precision `trsqrt`、Gather/ND2NZ 专项融合和 cost model 不进入本轮关键路径。
 
+在线跟踪：
+
+| Milestone | 截止日期 | Tracking issue |
+|---|---|---|
+| [M1 Region aggregation](https://github.com/TaoTao-real/dsv4-vmi-lowering-lab/milestone/1) | 2026-08-09 | [#2](https://github.com/TaoTao-real/dsv4-vmi-lowering-lab/issues/2) |
+| [M2 Critical candidate closure](https://github.com/TaoTao-real/dsv4-vmi-lowering-lab/milestone/2) | 2026-08-16 | [#3](https://github.com/TaoTao-real/dsv4-vmi-lowering-lab/issues/3) |
+| [M3 Loop Fusion and Mem2Reg](https://github.com/TaoTao-real/dsv4-vmi-lowering-lab/milestone/3) | 2026-08-23 | [#4](https://github.com/TaoTao-real/dsv4-vmi-lowering-lab/issues/4) |
+| [M4 A5 acceptance](https://github.com/TaoTao-real/dsv4-vmi-lowering-lab/milestone/4) | 2026-08-31 | [#5](https://github.com/TaoTao-real/dsv4-vmi-lowering-lab/issues/5) |
+
 ## M1：Region 聚集与可解释拒绝
 
 目标：将当前“每个 VMI TileOp 一个 region”收敛为依赖驱动的 maximal eligible

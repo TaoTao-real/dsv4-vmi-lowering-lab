@@ -25,6 +25,7 @@ artifacts/<ptoas-commit>/
   key-cases/                fusion-off and phase snapshots
   results.tsv               per-case compilation results
 reports/<ptoas-commit>/     machine-readable and Markdown analysis
+docs/progress/              stage reports and milestone acceptance gates
 ```
 
 The reusable input snapshot remains outside this repository:
@@ -82,6 +83,11 @@ snapshot, while deep fusion is not. The immediate target is to aggregate
 dependent VMI TileOps into multi-op regions and reduce local fallback inside
 the vector compute chain. See `reports/<commit>/summary.md` for the detailed
 evidence.
+
+Current tracking material:
+
+- [`docs/progress/2026-08-03-stage2-progress.md`](docs/progress/2026-08-03-stage2-progress.md)
+- [`docs/progress/milestone-plan.md`](docs/progress/milestone-plan.md)
 
 The eight key-case controls are diagnostic only: 7/8 fusion-off controls pass;
 the `rmsnorm_rope` fusion-off control independently fails at VPTO emission

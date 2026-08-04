@@ -1,0 +1,7 @@
+workload	case	mode	kernel_ticks	vloop	vld	vst	correctness	acceptance
+prefill_softmax	_jit_prefill_attention_csa_test_20260723_031246/ptoas/prefill_c4_softmax_pool.pto	legacy_off	8807	66	324	342	written_finite	control_only
+prefill_softmax	_jit_prefill_attention_csa_test_20260723_031246/ptoas/prefill_c4_softmax_pool.pto	vmi_on	9259	16	276	312	byte_equal_to_off	diagnostic_until_cpu_golden
+prefill_rope	_jit_prefill_attention_csa_test_20260723_031246/ptoas/rope.pto	legacy_off	10348	27	3265	3306	completed	not_accepted
+prefill_rope	_jit_prefill_attention_csa_test_20260723_031246/ptoas/rope.pto	vmi_on	10479	30	4034	3045	differs_from_off	not_accepted
+decode_rmsnorm_rope	_jit_attention_csa_test_20260723_032646/ptoas/rmsnorm_rope.pto	legacy_off	3564	15	321	395	completed_nonfinite_output	not_accepted
+decode_rmsnorm_rope	_jit_attention_csa_test_20260723_032646/ptoas/rmsnorm_rope.pto	vmi_on	4279	22	469	505	differs_from_off_nonfinite_output	not_accepted

@@ -31,7 +31,7 @@ docs/progress/              stage reports and milestone acceptance gates
 The reusable input snapshot remains outside this repository:
 
 ```text
-/Users/lishengtao/Documents/PTO/_ptoas_tech_lab_materials/datasets/dsv4/build_output
+$PTO_WORKSPACE/_ptoas_tech_lab_materials/datasets/dsv4/build_output
 ```
 
 ## Reproduce
@@ -88,6 +88,11 @@ Current tracking material:
 
 - [`docs/progress/2026-08-03-stage2-progress.md`](docs/progress/2026-08-03-stage2-progress.md)
 - [`docs/progress/milestone-plan.md`](docs/progress/milestone-plan.md)
+- [`docs/progress/performance-sampling-plan.md`](docs/progress/performance-sampling-plan.md)
+- [`docs/progress/2026-08-04-static-and-performance-results.md`](docs/progress/2026-08-04-static-and-performance-results.md)
+- [`manifests/performance_cases.tsv`](manifests/performance_cases.tsv)
+- [`reports/performance_baseline_20260803.tsv`](reports/performance_baseline_20260803.tsv)
+- [`reports/camodel-repeats-20260804-serial-r10/report.md`](reports/camodel-repeats-20260804-serial-r10/report.md)
 
 The eight key-case controls are diagnostic only: 7/8 fusion-off controls pass;
 the `rmsnorm_rope` fusion-off control independently fails at VPTO emission

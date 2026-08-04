@@ -1,0 +1,31 @@
+{
+  "ptoas_worktree": "$PTO_WORKSPACE/PTOAS_vmi_vf_next",
+  "ptoas_commit": "7d299080400cc7896137e9da6a6eb2b2b257635e",
+  "ptoas_binary": "$PTO_WORKSPACE/PTOAS_vmi_vf_next/build-llvm21/tools/ptoas/ptoas",
+  "dsv4_root": "$PTO_WORKSPACE/_ptoas_tech_lab_materials/datasets/dsv4/build_output",
+  "flags": [
+    "--pto-arch=a5",
+    "--pto-level=level3",
+    "--pto-backend=vpto",
+    "--tile-lib-backend=ptodsl",
+    "--enable-vmi",
+    "--enable-op-fusion",
+    "--emit-vpto"
+  ],
+  "case_count": 120,
+  "worktree": {
+    "dirty": true,
+    "status": [
+      " M lib/PTO/Transforms/PTOInferVPTOVecScope.cpp",
+      " M lib/PTO/Transforms/PTOViewToMemref.cpp",
+      " M test/lit/pto/materialize_tile_handles_fusion_region_subview.pto",
+      "?? test/lit/vpto/auto_vecscope_infer_shared_vbr.pto"
+    ],
+    "source_sha256": {
+      "lib/PTO/Transforms/PTOInferVPTOVecScope.cpp": "fbb01097f1dc43d3d54bbd0c96a118af2ad251d08f9267749713657190350c0e",
+      "lib/PTO/Transforms/PTOViewToMemref.cpp": "5bdaecd178b2073f8a7c5090fd5a4f78583627b526925fa6f930f693a3e9cc3f",
+      "lib/PTO/Transforms/PTOVmiLoopFusion.cpp": "704f7cf9d65f7bd2f5c7e9839afae9d5ee3dd7285daec1b8d384abb37b11fa65",
+      "lib/PTO/Transforms/PTOVmiLoadStoreElision.cpp": "ab08e10697bdd9ef66cd33e0dc745e3972b7a8ec82550afe278478491081da10"
+    }
+  }
+}

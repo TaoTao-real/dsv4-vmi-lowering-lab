@@ -1,0 +1,3 @@
+TileLib daemon 'ptodsl.tilelib.serving.daemon' started (pid=63294, socket=/tmp/tilelib_daemon_63293.sock)
+Info: ptodsl TileLib daemon started successfully
+TileLib daemon stopped (pid=63294)

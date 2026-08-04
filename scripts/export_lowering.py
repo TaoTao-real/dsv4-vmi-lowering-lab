@@ -5,6 +5,8 @@ from __future__ import annotations
 import argparse
 import csv
 import json
+import os
+import signal
 import shutil
 import subprocess
 import time
@@ -32,24 +34,59 @@ def load_key_cases() -> list[tuple[str, Path]]:
     return result
 
 
+def tilelib_pids_for_compiler(compiler_pid: int) -> set[int]:
+    completed = subprocess.run(
+        ("ps", "-axo", "pid=,ppid=,command="),
+        stdout=subprocess.PIPE,
+        text=True,
+        check=True,
+    )
+    result = set()
+    for line in completed.stdout.splitlines():
+        fields = line.strip().split(maxsplit=2)
+        if len(fields) != 3:
+            continue
+        if f"--socket /tmp/tilelib_daemon_{compiler_pid}.sock" in fields[2] and (
+            "ptodsl.tilelib.serving.daemon" in fields[2]
+            or "ptodsl.tilelib.serving.helper" in fields[2]
+        ):
+            result.add(int(fields[0]))
+    return result
+
+
+def cleanup_tilelib_processes(compiler_pid: int) -> None:
+    tilelib_pids = tilelib_pids_for_compiler(compiler_pid)
+    for sig in (signal.SIGTERM, signal.SIGKILL):
+        for pid in tilelib_pids:
+            try:
+                os.kill(pid, sig)
+            except ProcessLookupError:
+                pass
+        if sig == signal.SIGTERM and tilelib_pids:
+            time.sleep(0.2)
+            tilelib_pids = tilelib_pids_for_compiler(compiler_pid)
+
+
 def run(command: list[str], log: Path, timeout: int) -> tuple[str, int, str]:
     start = time.monotonic()
+    process = subprocess.Popen(
+        command,
+        env=command_env(),
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        text=True,
+        start_new_session=True,
+    )
     try:
-        completed = subprocess.run(
-            command,
-            env=command_env(),
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            text=True,
-            timeout=timeout,
-        )
-        text = completed.stdout or ""
-        status = "PASS" if completed.returncode == 0 else "FAIL"
-    except subprocess.TimeoutExpired as error:
-        text = error.stdout or ""
-        if isinstance(text, bytes):
-            text = text.decode(errors="replace")
+        text, _ = process.communicate(timeout=timeout)
+        status = "PASS" if process.returncode == 0 else "FAIL"
+    except subprocess.TimeoutExpired:
+        os.killpg(process.pid, signal.SIGKILL)
+        text, _ = process.communicate()
         status = "TIMEOUT"
+    finally:
+        cleanup_tilelib_processes(process.pid)
+    text = text or ""
     log.parent.mkdir(parents=True, exist_ok=True)
     log.write_text(text)
     elapsed = int(time.monotonic() - start)
@@ -192,9 +229,39 @@ def write_tsv(path: Path, rows: list[dict[str, object]]) -> None:
     if not rows:
         return
     with path.open("w", newline="") as stream:
-        writer = csv.DictWriter(stream, fieldnames=list(rows[0]), delimiter="\t")
+        writer = csv.DictWriter(
+            stream, fieldnames=list(rows[0]), delimiter="\t", lineterminator="\n"
+        )
         writer.writeheader()
         writer.writerows(rows)
+
+
+def worktree_provenance() -> dict[str, object]:
+    status = subprocess.check_output(
+        ("git", "status", "--porcelain"), cwd=PTOAS_WORKTREE, text=True
+    ).splitlines()
+    tracked_sources = (
+        "lib/PTO/Transforms/PTOInferVPTOVecScope.cpp",
+        "lib/PTO/Transforms/PTOViewToMemref.cpp",
+        "lib/PTO/Transforms/PTOVmiLoopFusion.cpp",
+        "lib/PTO/Transforms/PTOVmiLoadStoreElision.cpp",
+    )
+    return {
+        "dirty": bool(status),
+        "status": status,
+        "source_sha256": {
+            relative: sha256(PTOAS_WORKTREE / relative)
+            for relative in tracked_sources
+            if (PTOAS_WORKTREE / relative).exists()
+        },
+    }
+
+
+def portable_path(path: Path) -> str:
+    try:
+        return "$PTO_WORKSPACE/" + str(path.resolve().relative_to(REPO.parent.resolve()))
+    except ValueError:
+        return str(path)
 
 
 def main() -> None:
@@ -209,10 +276,10 @@ def main() -> None:
 
     commit = git_commit()
     manifest = {
-        "ptoas_worktree": str(PTOAS_WORKTREE),
+        "ptoas_worktree": portable_path(PTOAS_WORKTREE),
         "ptoas_commit": commit,
-        "ptoas_binary": str(PTOAS),
-        "dsv4_root": str(DSV4_ROOT),
+        "ptoas_binary": portable_path(PTOAS),
+        "dsv4_root": portable_path(DSV4_ROOT),
         "flags": [
             "--pto-arch=a5",
             "--pto-level=level3",
@@ -223,6 +290,7 @@ def main() -> None:
             "--emit-vpto",
         ],
         "case_count": len(list(DSV4_ROOT.glob("**/*.pto"))),
+        "worktree": worktree_provenance(),
     }
     artifact_root = REPO / "artifacts" / commit
     artifact_root.mkdir(parents=True, exist_ok=True)
@@ -232,7 +300,7 @@ def main() -> None:
     input_manifest = REPO / "manifests" / f"{commit}-inputs.tsv"
     input_manifest.parent.mkdir(parents=True, exist_ok=True)
     with input_manifest.open("w", newline="") as stream:
-        writer = csv.writer(stream, delimiter="\t")
+        writer = csv.writer(stream, delimiter="\t", lineterminator="\n")
         writer.writerow(("case", "bytes", "sha256"))
         for source in sorted(DSV4_ROOT.glob("**/*.pto")):
             writer.writerow((str(source.relative_to(DSV4_ROOT)), source.stat().st_size, sha256(source)))

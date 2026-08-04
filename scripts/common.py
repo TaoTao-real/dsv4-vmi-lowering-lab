@@ -14,7 +14,7 @@ PTOAS_WORKTREE = Path(os.environ.get(
 ))
 DSV4_ROOT = Path(os.environ.get(
     "DSV4_ROOT",
-    str(WORKSPACE / "_ptoas_tech_lab_materials/datasets/dsv4/build_output"),
+    str(REPO / "inputs/dsv4"),
 ))
 PTOAS = Path(os.environ.get(
     "PTOAS_BIN", str(PTOAS_WORKTREE / "build-llvm21/tools/ptoas/ptoas")

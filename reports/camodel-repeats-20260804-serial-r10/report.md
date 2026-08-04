@@ -4,6 +4,10 @@
 
 - Classification: historical-object repeat sampling.
 - Remote objects were built on 2026-08-03; these timings are not current-HEAD runtime evidence.
+- The 120 compiler inputs are checked in under `inputs/dsv4`, but the remote
+  historical harness and its numerical fixtures were not preserved here; the
+  80 timing samples therefore cannot yet be replayed byte-for-byte from this
+  repository alone.
 - Remote Loop Fusion and Load/Store Elision source hashes match the local worktree; VecScope inference differs because the local worktree has an uncommitted Vbr fix.
 - Runs are serial and instruction counts come from `instr_exe.csv` dynamic call counts.
 - A nonzero host status means the result is diagnostic only unless separately accepted below.

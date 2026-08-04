@@ -4,3 +4,5 @@ __pycache__/
 *.swp
 artifacts/*/logs/
 artifacts/*/tmp/
+reports/camodel-repeats-*-pilot*/
+reports/camodel-repeats-*-smoke*/

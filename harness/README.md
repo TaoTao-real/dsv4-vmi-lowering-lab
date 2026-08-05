@@ -34,6 +34,10 @@ PTOAS `test/npu_validation/scripts/generate_testcase.py` to infer pointer
 buffer sizes and generate the ACL launcher, CMake project, deterministic input
 files, and simulator executable.
 
+Each variant runs TileLib/VMI lowering once to produce final VPTO. The object
+is compiled from that saved VPTO, so large cases do not repeat candidate
+selection and expansion merely to create the measured binary.
+
 Before sampling, the harness regenerates every variant's binary fixture and
 requires the complete filename-to-SHA256 mapping to match. It stores this proof
 under `fixtures/<case>.json`, records the fixture digest in every TSV row, and

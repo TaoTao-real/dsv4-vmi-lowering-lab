@@ -147,6 +147,27 @@ class CamodelHarnessTest(unittest.TestCase):
             "--enable-op-fusion=true", HARNESS.VARIANTS["vmi_fused"]["flags"]
         )
 
+    def test_object_is_compiled_from_saved_final_vpto(self):
+        command = HARNESS.final_vpto_object_command(
+            Path("/opt/ptoas"),
+            Path("work/kernel.vpto.mlir"),
+            Path("work/kernel.o"),
+        )
+        self.assertEqual(
+            command,
+            [
+                "/opt/ptoas",
+                "--pto-arch=a5",
+                "--pto-level=level3",
+                "--pto-backend=vpto",
+                "work/kernel.vpto.mlir",
+                "-o",
+                "work/kernel.o",
+            ],
+        )
+        self.assertNotIn("--tile-lib-backend=ptodsl", command)
+        self.assertNotIn("--enable-vmi=true", command)
+
     def test_profile_metrics_count_each_instruction_once(self):
         with TemporaryDirectory() as directory:
             root = Path(directory)

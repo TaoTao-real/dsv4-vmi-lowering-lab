@@ -135,6 +135,20 @@ def compiler_env() -> dict[str, str]:
     return env
 
 
+def final_vpto_object_command(
+    ptoas_bin: Path, final_vpto: Path, kernel_object: Path
+) -> list[str]:
+    return [
+        str(ptoas_bin),
+        "--pto-arch=a5",
+        "--pto-level=level3",
+        "--pto-backend=vpto",
+        str(final_vpto),
+        "-o",
+        str(kernel_object),
+    ]
+
+
 def select_names(selection: str, available: list[str]) -> list[str]:
     if selection == "all":
         return available
@@ -317,13 +331,17 @@ def prepare_case(case_name: str, case: dict, variant: str) -> None:
         )
     ptodsl_path = os.environ.get("PTODSL_PKG_PATH", str(ptoas_source / "ptodsl"))
     common_command.append(f"--ptodsl-pkg-path={ptodsl_path}")
+    final_vpto = root / "kernel.vpto.mlir"
     ir_command = [
         *common_command, "--emit-vpto", str(compile_source),
-        "-o", str(root / "kernel.vpto.mlir"),
+        "-o", str(final_vpto),
     ]
     run(ir_command, env=compiler_env(), log=root / "emit-vpto.log")
-    object_command = list(common_command)
-    object_command.extend((str(compile_source), "-o", str(kernel_object)))
+    # Compile the already lowered final VPTO instead of repeating TileLib
+    # selection, expansion, inline, and VMI physicalization for the object.
+    object_command = final_vpto_object_command(
+        ptoas_bin, final_vpto, kernel_object
+    )
     run(object_command, env=compiler_env(), log=root / "compile.log")
 
     # The testcase generator currently parses EmitC C++, while the measured

@@ -289,7 +289,11 @@ def resolve_kernel_symbol(library: Path, kernel: str) -> str:
             continue
         symbol = fields[-1]
         demangled = capture(["c++filt", symbol])
-        if demangled.startswith(f"{kernel}("):
+        if (
+            symbol == kernel
+            or demangled == kernel
+            or demangled.startswith(f"{kernel}(")
+        ):
             return symbol
     die(f"cannot resolve {kernel} symbol in {library}")
 

@@ -117,6 +117,15 @@ class CamodelHarnessTest(unittest.TestCase):
             HARNESS.resource.RLIMIT_NOFILE, (65536, 1048576)
         )
 
+    def test_kernel_symbol_accepts_extern_c_export(self):
+        with mock.patch.object(
+            HARNESS, "capture", side_effect=("00000000 T rope\n", "rope")
+        ):
+            self.assertEqual(
+                HARNESS.resolve_kernel_symbol(Path("libkernel.so"), "rope"),
+                "rope",
+            )
+
     def test_variants_keep_the_fusion_comparison_isolated(self):
         self.assertEqual(HARNESS.VARIANTS["ordinary"]["backend"], "emitc")
         self.assertEqual(HARNESS.VARIANTS["vmi_base"]["backend"], "vpto")

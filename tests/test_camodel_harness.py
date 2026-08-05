@@ -158,6 +158,17 @@ class CamodelHarnessTest(unittest.TestCase):
             )
             self.assertEqual(HARNESS.parse_profile(root), ("1234", 2, 3, 12))
 
+    def test_profile_tick_can_come_from_profiler_log(self):
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            profile = root / "profile"
+            profile.mkdir()
+            log = root / "msprof.log"
+            log.write_text("[INFO] Total tick: 57891\n")
+            self.assertEqual(
+                HARNESS.parse_profile(profile, log), ("57891", 0, 0, 0)
+            )
+
 
 if __name__ == "__main__":
     unittest.main()

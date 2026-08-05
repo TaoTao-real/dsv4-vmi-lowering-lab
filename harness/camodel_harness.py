@@ -303,9 +303,14 @@ def resolve_kernel_symbol(library: Path, kernel: str) -> str:
     die(f"cannot resolve {kernel} symbol in {library}")
 
 
-def parse_profile(profile_root: Path) -> tuple[str, int, int, int]:
+def parse_profile(
+    profile_root: Path, profiler_log: Path | None = None
+) -> tuple[str, int, int, int]:
     tick = "NA"
-    for log in profile_root.rglob("*.log"):
+    logs = list(profile_root.rglob("*.log"))
+    if profiler_log is not None and profiler_log.is_file():
+        logs.append(profiler_log)
+    for log in logs:
         matches = re.findall(r"Total tick:\s*(\d+)", log.read_text(errors="replace"))
         if matches:
             tick = matches[-1]
@@ -382,7 +387,7 @@ def sample_case(case_name: str, case: dict, variant: str, repeats: int,
             f"--output={profile_root}",
         ]
         run(command, cwd=generated, env=simulator_env(build_dir), log=log)
-        tick, vloop, vld, vst = parse_profile(profile_root)
+        tick, vloop, vld, vst = parse_profile(profile_root, log)
         if tick == "NA":
             die(f"msprof produced no Total tick; see {log} and {profile_root}")
         rows.append([

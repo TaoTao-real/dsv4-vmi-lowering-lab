@@ -23,7 +23,7 @@ class CamodelHarnessTest(unittest.TestCase):
     def test_manifest_inputs_exist(self):
         manifest = json.loads((REPO / "harness/cases.json").read_text())
         self.assertEqual(manifest["schema_version"], 1)
-        self.assertEqual(len(manifest["cases"]), 3)
+        self.assertEqual(len(manifest["cases"]), 6)
         for case in manifest["cases"].values():
             self.assertTrue((REPO / case["pto"]).is_file())
 
@@ -134,9 +134,12 @@ class CamodelHarnessTest(unittest.TestCase):
             self.assertEqual(os.stat(profile).st_mode & 0o777, 0o700)
 
     def test_variants_keep_the_fusion_comparison_isolated(self):
-        self.assertEqual(HARNESS.VARIANTS["ordinary"]["backend"], "emitc")
+        self.assertEqual(HARNESS.VARIANTS["ordinary"]["backend"], "vpto")
         self.assertEqual(HARNESS.VARIANTS["vmi_base"]["backend"], "vpto")
         self.assertEqual(HARNESS.VARIANTS["vmi_fused"]["backend"], "vpto")
+        self.assertIn(
+            "--enable-vmi=false", HARNESS.VARIANTS["ordinary"]["flags"]
+        )
         self.assertIn(
             "--enable-op-fusion=false", HARNESS.VARIANTS["vmi_base"]["flags"]
         )
@@ -168,6 +171,37 @@ class CamodelHarnessTest(unittest.TestCase):
             self.assertEqual(
                 HARNESS.parse_profile(profile, log), ("57891", 0, 0, 0)
             )
+
+    def test_fixture_manifests_require_identical_files_and_hashes(self):
+        fixture = {"input.bin": "abc", "output.bin": "def"}
+        self.assertEqual(
+            HARNESS.verify_fixture_manifests(
+                "rope", {"ordinary": fixture, "vmi_base": dict(fixture)}
+            ),
+            HARNESS.digest_mapping(fixture),
+        )
+        with self.assertRaises(SystemExit):
+            HARNESS.verify_fixture_manifests(
+                "rope",
+                {
+                    "ordinary": fixture,
+                    "vmi_base": {
+                        "input.bin": "changed",
+                        "output.bin": "def",
+                    },
+                },
+            )
+
+    def test_binary_comparison_reports_first_mismatch(self):
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            baseline = root / "baseline.bin"
+            candidate = root / "candidate.bin"
+            baseline.write_bytes(b"abcdef")
+            candidate.write_bytes(b"abcxef")
+            comparison = HARNESS.compare_binary_files(baseline, candidate)
+            self.assertFalse(comparison["equal"])
+            self.assertEqual(comparison["first_mismatch_byte"], 3)
 
 
 if __name__ == "__main__":

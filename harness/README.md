@@ -1,6 +1,6 @@
 # Reproducible Camodel Harness
 
-This harness turns the three primary DSv4 VMI VF Fusion `.pto` inputs into
+This harness turns six representative DSv4 VMI VF Fusion `.pto` inputs into
 runnable standalone kernels. It replaces the historical, unarchived
 `vmi_camodel_harness` dependency used by the first sampling report.
 
@@ -10,26 +10,35 @@ runnable standalone kernels. It replaces the historical, unarchived
 prefill_softmax       prefill_c4_softmax_pool.pto
 prefill_rope          rope.pto
 decode_rmsnorm_rope   rmsnorm_rope.pto
+decode_rmsnorm        standalone rms_norm.pto
+decode_comb_sinkhorn  decode comb_sinkhorn.pto
+prefill_comb_sinkhorn prefill comb_sinkhorn.pto
 ```
 
 Each case supports three compiler variants:
 
 | Variant | VMI candidate | PTOAS low-level fusion |
 |---|---:|---:|
-| `ordinary` | EmitC/PTO-ISA TileOp baseline | off |
+| `ordinary` | ordinary PTODSL candidate through VPTO | off |
 | `vmi_base` | on | off |
 | `vmi_fused` | on | on |
 
-The ordinary control deliberately uses PTOAS EmitC because the unified PTODSL
-VPTO path defaults to VMI candidates; `--enable-vmi=false` is not a reliable
-ordinary-candidate selector there. This means `ordinary -> vmi_base` compares
-both the TileOp implementation and backend, while `vmi_base -> vmi_fused`
-isolates the PTOAS fusion lifecycle.
+All three controls use the VPTO backend. Candidate-only experiments require a
+PTOAS build in which VMI candidate selection is independently enabled by
+`--enable-vmi=true` while `--enable-op-fusion=false` keeps FusionPlan, VMI loop
+fusion, and load/store elision disabled. This is an experiment-only compiler
+configuration; inspect final VPTO before accepting samples.
 
 All variants are rebuilt from the same checked-in PTO input. The harness uses
 PTOAS `test/npu_validation/scripts/generate_testcase.py` to infer pointer
 buffer sizes and generate the ACL launcher, CMake project, deterministic input
 files, and simulator executable.
+
+Before sampling, the harness regenerates every variant's binary fixture and
+requires the complete filename-to-SHA256 mapping to match. It stores this proof
+under `fixtures/<case>.json`, records the fixture digest in every TSV row, and
+saves per-repeat output snapshots plus byte-exact A/B comparisons under
+`outputs/` and `comparisons/`.
 
 ## Two Evidence Paths
 
@@ -60,11 +69,11 @@ python3 harness/camodel_harness.py doctor --runtime
 `ASCEND_HOME_PATH` is required during `prepare`, because current PTOAS C++ and
 fat-object emission resolves the installed CANN ABI even before runtime.
 
-The default simulator target follows the existing A3 camodel environment:
+The default simulator target follows the shared A5 camodel environment:
 
 ```text
-SOC_VERSION=Ascend910_9599
-AICORE_ARCH=dav-c220-vec
+SOC_VERSION=Ascend950PR_9599
+AICORE_ARCH=dav-c310-vec
 ```
 
 Override these variables when using another installed simulator. PTOAS still
@@ -130,5 +139,5 @@ other kernels because it validates model semantics, not isolated latency.
   golden.
 - Keep PTOAS commit, PTO input hash, CANN version, simulator target, scalar
   overrides, and exact command from `provenance.json` with every report.
-- Use the `vmi_base -> vmi_fused` comparison to isolate the fusion lifecycle.
-  `ordinary -> vmi_base` also changes candidate implementation.
+- Use `ordinary -> vmi_base` to measure candidate cost and
+  `vmi_base -> vmi_fused` to measure the fusion lifecycle.

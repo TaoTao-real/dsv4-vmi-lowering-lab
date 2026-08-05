@@ -241,12 +241,16 @@ def runtime_env() -> dict[str, str]:
     return env
 
 
-def execute_generated(case_name: str, variant: str, log: Path) -> None:
+def execute_generated(case_name: str, variant: str, log: Path,
+                      golden_mode: str | None = None) -> None:
     generated = generated_case_dir(case_name, variant)
     run_sh = generated / "run.sh"
     if not run_sh.is_file():
         die(f"case is not prepared: {generated}")
-    run(["bash", str(run_sh)], cwd=generated, env=runtime_env(), log=log)
+    env = runtime_env()
+    if golden_mode is not None:
+        env["GOLDEN_MODE"] = golden_mode
+    run(["bash", str(run_sh)], cwd=generated, env=env, log=log)
 
 
 def output_hashes(generated: Path) -> str:
@@ -325,7 +329,9 @@ def sample_case(case_name: str, case: dict, variant: str, repeats: int,
     provenance_dir.mkdir(parents=True, exist_ok=True)
     shutil.copy2(provenance, provenance_dir / f"{case_name}.{variant}.json")
     execute_generated(
-        case_name, variant, result_root / "logs" / f"{case_name}.{variant}.build.log"
+        case_name, variant,
+        result_root / "logs" / f"{case_name}.{variant}.build.log",
+        golden_mode="sim",
     )
     testcase = f"{case_name}_{variant}"
     build_dir = generated / "build"

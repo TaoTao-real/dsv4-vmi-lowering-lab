@@ -7,6 +7,7 @@ import json
 from pathlib import Path
 from tempfile import TemporaryDirectory
 import unittest
+from unittest import mock
 
 
 REPO = Path(__file__).resolve().parents[1]
@@ -83,6 +84,26 @@ class CamodelHarnessTest(unittest.TestCase):
                 ),
                 "unknown",
             )
+
+    def test_sample_execution_requests_simulator_build(self):
+        with TemporaryDirectory() as directory:
+            generated = Path(directory)
+            run_sh = generated / "run.sh"
+            run_sh.touch()
+            with (
+                mock.patch.object(
+                    HARNESS, "generated_case_dir", return_value=generated
+                ),
+                mock.patch.object(
+                    HARNESS, "runtime_env", return_value={"GOLDEN_MODE": "skip"}
+                ),
+                mock.patch.object(HARNESS, "run") as run_mock,
+            ):
+                HARNESS.execute_generated(
+                    "prefill_rope", "ordinary", generated / "run.log",
+                    golden_mode="sim",
+                )
+            self.assertEqual(run_mock.call_args.kwargs["env"]["GOLDEN_MODE"], "sim")
 
     def test_variants_keep_the_fusion_comparison_isolated(self):
         self.assertEqual(HARNESS.VARIANTS["ordinary"]["backend"], "emitc")

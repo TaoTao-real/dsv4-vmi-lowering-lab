@@ -1,0 +1,7 @@
+interface:
+  display_name: "Verify DSv4 VMI Lowering"
+  short_description: "Reproduce DSv4 lowering and fusion-readiness checks"
+  default_prompt: "Use $verify-dsv4-vmi-lowering to validate the checked-in DSv4 inputs and report VMI lowering and fusion readiness."
+
+policy:
+  allow_implicit_invocation: true

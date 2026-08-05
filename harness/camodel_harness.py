@@ -125,9 +125,27 @@ def case_dir(case_name: str, variant: str) -> Path:
     return WORK_ROOT / case_name / variant
 
 
+def discover_generated_case_dir(generated_root: Path, testcase: str) -> Path:
+    matches = sorted(
+        metadata.parent
+        for metadata in generated_root.rglob("validation_meta.env")
+        if metadata.parent.name == testcase
+    )
+    if not matches:
+        die(
+            f"generated testcase {testcase} was not found under {generated_root}; "
+            "run prepare first or inspect generate.log"
+        )
+    if len(matches) != 1:
+        formatted = ", ".join(str(path) for path in matches)
+        die(f"generated testcase {testcase} is ambiguous: {formatted}")
+    return matches[0]
+
+
 def generated_case_dir(case_name: str, variant: str) -> Path:
     testcase = f"{case_name}_{variant}"
-    return case_dir(case_name, variant) / "generated" / "ptoas" / testcase
+    generated_root = case_dir(case_name, variant) / "generated"
+    return discover_generated_case_dir(generated_root, testcase)
 
 
 def prepare_case(case_name: str, case: dict, variant: str) -> None:

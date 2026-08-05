@@ -49,6 +49,32 @@ class CamodelHarnessTest(unittest.TestCase):
         with self.assertRaises(SystemExit):
             HARNESS.select_names("", ["ordinary"])
 
+    def test_generated_case_directory_is_discovered_under_any_category(self):
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            testcase = root / "generated" / "ordinary" / "rope_ordinary"
+            testcase.mkdir(parents=True)
+            (testcase / "validation_meta.env").touch()
+            self.assertEqual(
+                HARNESS.discover_generated_case_dir(
+                    root / "generated", "rope_ordinary"
+                ),
+                testcase,
+            )
+
+    def test_generated_case_directory_requires_exactly_one_match(self):
+        with TemporaryDirectory() as directory:
+            root = Path(directory) / "generated"
+            with self.assertRaises(SystemExit):
+                HARNESS.discover_generated_case_dir(root, "rope_ordinary")
+
+            for category in ("ordinary", "ptoas"):
+                testcase = root / category / "rope_ordinary"
+                testcase.mkdir(parents=True)
+                (testcase / "validation_meta.env").touch()
+            with self.assertRaises(SystemExit):
+                HARNESS.discover_generated_case_dir(root, "rope_ordinary")
+
     def test_variants_keep_the_fusion_comparison_isolated(self):
         self.assertEqual(HARNESS.VARIANTS["ordinary"]["backend"], "emitc")
         self.assertEqual(HARNESS.VARIANTS["vmi_base"]["backend"], "vpto")

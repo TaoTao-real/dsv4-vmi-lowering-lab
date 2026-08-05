@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import os
 from pathlib import Path
 from tempfile import TemporaryDirectory
 import unittest
@@ -125,6 +126,12 @@ class CamodelHarnessTest(unittest.TestCase):
                 HARNESS.resolve_kernel_symbol(Path("libkernel.so"), "rope"),
                 "rope",
             )
+
+    def test_profile_directory_is_private(self):
+        with TemporaryDirectory() as directory:
+            profile = Path(directory) / "profiles" / "repeat-01"
+            HARNESS.create_private_directory(profile)
+            self.assertEqual(os.stat(profile).st_mode & 0o777, 0o700)
 
     def test_variants_keep_the_fusion_comparison_isolated(self):
         self.assertEqual(HARNESS.VARIANTS["ordinary"]["backend"], "emitc")

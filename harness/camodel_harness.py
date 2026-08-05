@@ -281,6 +281,11 @@ def output_hashes(generated: Path) -> str:
     return ",".join(hashes) if hashes else "NA"
 
 
+def create_private_directory(path: Path) -> None:
+    path.mkdir(parents=True, exist_ok=True)
+    path.chmod(0o700)
+
+
 def resolve_kernel_symbol(library: Path, kernel: str) -> str:
     nm_output = capture(["nm", "-D", str(library)])
     for line in nm_output.splitlines():
@@ -365,7 +370,7 @@ def sample_case(case_name: str, case: dict, variant: str, repeats: int,
     for repeat in range(1, repeats + 1):
         run([sys.executable, "golden.py"], cwd=generated)
         profile_root = result_root / "profiles" / case_name / variant / f"repeat-{repeat:02d}"
-        profile_root.mkdir(parents=True, exist_ok=True)
+        create_private_directory(profile_root)
         log = result_root / "logs" / f"{case_name}.{variant}.{repeat:02d}.log"
         command = [
             "msprof", "op", "simulator",
@@ -378,6 +383,8 @@ def sample_case(case_name: str, case: dict, variant: str, repeats: int,
         ]
         run(command, cwd=generated, env=simulator_env(build_dir), log=log)
         tick, vloop, vld, vst = parse_profile(profile_root)
+        if tick == "NA":
+            die(f"msprof produced no Total tick; see {log} and {profile_root}")
         rows.append([
             case_name, variant, str(repeat), tick, str(vloop), str(vld),
             str(vst), output_hashes(generated), str(log), str(profile_root),

@@ -78,6 +78,15 @@ def capture(command: list[str], *, cwd: Path | None = None) -> str:
     return subprocess.check_output(command, cwd=cwd, text=True).strip()
 
 
+def capture_optional(command: list[str], *, cwd: Path | None = None) -> str:
+    try:
+        return subprocess.check_output(
+            command, cwd=cwd, text=True, stderr=subprocess.DEVNULL
+        ).strip()
+    except (OSError, subprocess.CalledProcessError):
+        return "unknown"
+
+
 def required_path(env_name: str, description: str) -> Path:
     value = os.environ.get(env_name)
     if not value:
@@ -205,7 +214,9 @@ def prepare_case(case_name: str, case: dict, variant: str) -> None:
         "compiler_command": command,
         "generator_command": generator_command,
         "ptoas_source": str(ptoas_source),
-        "ptoas_commit": capture(["git", "rev-parse", "HEAD"], cwd=ptoas_source),
+        "ptoas_commit": capture_optional(
+            ["git", "rev-parse", "HEAD"], cwd=ptoas_source
+        ),
         "ptoas_bin": str(ptoas_bin),
         "ptoas_version": capture([str(ptoas_bin), "--version"]),
         "ascend_home_path": os.environ["ASCEND_HOME_PATH"],

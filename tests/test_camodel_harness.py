@@ -75,6 +75,15 @@ class CamodelHarnessTest(unittest.TestCase):
             with self.assertRaises(SystemExit):
                 HARNESS.discover_generated_case_dir(root, "rope_ordinary")
 
+    def test_optional_provenance_command_allows_non_git_source(self):
+        with TemporaryDirectory() as directory:
+            self.assertEqual(
+                HARNESS.capture_optional(
+                    ["git", "rev-parse", "HEAD"], cwd=Path(directory)
+                ),
+                "unknown",
+            )
+
     def test_variants_keep_the_fusion_comparison_isolated(self):
         self.assertEqual(HARNESS.VARIANTS["ordinary"]["backend"], "emitc")
         self.assertEqual(HARNESS.VARIANTS["vmi_base"]["backend"], "vpto")

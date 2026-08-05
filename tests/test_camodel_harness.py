@@ -1,0 +1,79 @@
+#!/usr/bin/env python3
+
+from __future__ import annotations
+
+import importlib.util
+import json
+from pathlib import Path
+from tempfile import TemporaryDirectory
+import unittest
+
+
+REPO = Path(__file__).resolve().parents[1]
+MODULE_PATH = REPO / "harness/camodel_harness.py"
+SPEC = importlib.util.spec_from_file_location("camodel_harness", MODULE_PATH)
+assert SPEC and SPEC.loader
+HARNESS = importlib.util.module_from_spec(SPEC)
+SPEC.loader.exec_module(HARNESS)
+
+
+class CamodelHarnessTest(unittest.TestCase):
+    def test_manifest_inputs_exist(self):
+        manifest = json.loads((REPO / "harness/cases.json").read_text())
+        self.assertEqual(manifest["schema_version"], 1)
+        self.assertEqual(len(manifest["cases"]), 3)
+        for case in manifest["cases"].values():
+            self.assertTrue((REPO / case["pto"]).is_file())
+
+    def test_scalar_overrides_are_exact(self):
+        with TemporaryDirectory() as directory:
+            main_cpp = Path(directory) / "main.cpp"
+            main_cpp.write_text(
+                "    int64_t v10 = 1;\n"
+                "    int32_t v11 = 1;\n"
+                "    int32_t v12 = 1;\n"
+            )
+            HARNESS.patch_scalar_overrides(
+                main_cpp, {"v10": 128, "v11": 0, "v12": 64}
+            )
+            self.assertEqual(
+                main_cpp.read_text(),
+                "    int64_t v10 = 128;\n"
+                "    int32_t v11 = 0;\n"
+                "    int32_t v12 = 64;\n",
+            )
+
+    def test_unknown_selection_is_rejected(self):
+        with self.assertRaises(SystemExit):
+            HARNESS.select_names("missing", ["ordinary"])
+        with self.assertRaises(SystemExit):
+            HARNESS.select_names("", ["ordinary"])
+
+    def test_variants_keep_the_fusion_comparison_isolated(self):
+        self.assertEqual(HARNESS.VARIANTS["ordinary"]["backend"], "emitc")
+        self.assertEqual(HARNESS.VARIANTS["vmi_base"]["backend"], "vpto")
+        self.assertEqual(HARNESS.VARIANTS["vmi_fused"]["backend"], "vpto")
+        self.assertIn(
+            "--enable-op-fusion=false", HARNESS.VARIANTS["vmi_base"]["flags"]
+        )
+        self.assertIn(
+            "--enable-op-fusion=true", HARNESS.VARIANTS["vmi_fused"]["flags"]
+        )
+
+    def test_profile_metrics_count_each_instruction_once(self):
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "msprof.stdout.log").write_text("Total tick: 1234\n")
+            csv_path = root / "core0.veccore0_instr_exe.csv"
+            csv_path.write_text(
+                "instr,call_count\n"
+                "VLOOP,2\n"
+                "RV_VLD,3\n"
+                "RV_VST,5\n"
+                "VSST,7\n"
+            )
+            self.assertEqual(HARNESS.parse_profile(root), ("1234", 2, 3, 12))
+
+
+if __name__ == "__main__":
+    unittest.main()

@@ -26,6 +26,7 @@ artifacts/<ptoas-commit>/
   results.tsv               per-case compilation results
 reports/<ptoas-commit>/     machine-readable and Markdown analysis
 docs/progress/              stage reports and milestone acceptance gates
+harness/                    runnable standalone and model-fixture experiments
 ```
 
 The 120 PTO inputs used by the checked-in reports are available directly under
@@ -48,6 +49,13 @@ python3 scripts/export_lowering.py
 python3 scripts/analyze_lowering.py
 python3 scripts/verify_artifacts.py
 ```
+
+For reproducible camodel experiments on the three primary Softmax, RoPE, and
+RMSNorm/RoPE kernels, see [`harness/README.md`](harness/README.md). The harness
+builds ordinary, VMI-base, and VMI-fused variants from the checked-in `.pto`
+inputs, generates ACL launchers and deterministic fixtures, and collects
+repeatable `msprof op simulator` samples. It also exposes the original PyPTO
+model tests as the CPU-golden correctness path.
 
 The defaults target the local PTOAS VMI VF Fusion worktree. Every generated
 manifest records the exact compiler commit, command-line flags, input hashes,

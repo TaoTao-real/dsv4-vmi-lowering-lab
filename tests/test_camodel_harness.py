@@ -105,6 +105,18 @@ class CamodelHarnessTest(unittest.TestCase):
                 )
             self.assertEqual(run_mock.call_args.kwargs["env"]["GOLDEN_MODE"], "sim")
 
+    def test_camodel_open_file_limit_is_raised(self):
+        with (
+            mock.patch.object(
+                HARNESS.resource, "getrlimit", return_value=(1024, 1048576)
+            ),
+            mock.patch.object(HARNESS.resource, "setrlimit") as setrlimit_mock,
+        ):
+            HARNESS.ensure_open_file_limit()
+        setrlimit_mock.assert_called_once_with(
+            HARNESS.resource.RLIMIT_NOFILE, (65536, 1048576)
+        )
+
     def test_variants_keep_the_fusion_comparison_isolated(self):
         self.assertEqual(HARNESS.VARIANTS["ordinary"]["backend"], "emitc")
         self.assertEqual(HARNESS.VARIANTS["vmi_base"]["backend"], "vpto")

@@ -9,6 +9,7 @@ import json
 import os
 from pathlib import Path
 import re
+import resource
 import shutil
 import subprocess
 import sys
@@ -95,6 +96,21 @@ def required_path(env_name: str, description: str) -> Path:
     if not path.exists():
         die(f"{env_name} does not exist: {path}")
     return path
+
+
+def ensure_open_file_limit(minimum: int = 65536) -> None:
+    soft, hard = resource.getrlimit(resource.RLIMIT_NOFILE)
+    if soft >= minimum:
+        return
+    if hard != resource.RLIM_INFINITY and hard < minimum:
+        die(
+            f"camodel requires RLIMIT_NOFILE >= {minimum}, but the hard limit "
+            f"is {hard}"
+        )
+    try:
+        resource.setrlimit(resource.RLIMIT_NOFILE, (minimum, hard))
+    except (OSError, ValueError) as error:
+        die(f"failed to raise RLIMIT_NOFILE from {soft} to {minimum}: {error}")
 
 
 def compiler_env() -> dict[str, str]:
@@ -321,6 +337,7 @@ def simulator_env(build_dir: Path) -> dict[str, str]:
 
 def sample_case(case_name: str, case: dict, variant: str, repeats: int,
                 result_root: Path, rows: list[list[str]]) -> None:
+    ensure_open_file_limit()
     generated = generated_case_dir(case_name, variant)
     provenance = case_dir(case_name, variant) / "provenance.json"
     if not provenance.is_file():
@@ -374,6 +391,7 @@ def doctor(runtime: bool) -> None:
             die(f"{name}: missing {source}")
     if runtime:
         required_path("PTO_ISA_ROOT", "the PTO-ISA checkout")
+        ensure_open_file_limit()
         for tool in ("cmake", "msprof", "nm", "c++filt"):
             if shutil.which(tool) is None:
                 die(f"missing runtime tool: {tool}")

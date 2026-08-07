@@ -1,0 +1,39 @@
+{
+  "ptoas_worktree": "$PTO_WORKSPACE/_codex_worktrees/vmi-vbr-vecscope-clone",
+  "ptoas_commit": "15eee8625f223d9ec497744f49e38c0e294dc583",
+  "ptoas_binary": "$PTO_WORKSPACE/_codex_worktrees/vmi-vbr-vecscope-clone/build-llvm21/tools/ptoas/ptoas",
+  "dsv4_root": "$PTO_WORKSPACE/dsv4-vmi-lowering-lab/inputs/dsv4",
+  "variants": {
+    "fusion_off": [
+      "--pto-arch=a5",
+      "--pto-level=level3",
+      "--pto-backend=vpto",
+      "--tile-lib-backend=ptodsl",
+      "--enable-vmi",
+      "--enable-op-fusion=false",
+      "--enable-insert-sync",
+      "--emit-vpto"
+    ],
+    "fusion_on": [
+      "--pto-arch=a5",
+      "--pto-level=level3",
+      "--pto-backend=vpto",
+      "--tile-lib-backend=ptodsl",
+      "--enable-vmi",
+      "--enable-op-fusion",
+      "--enable-insert-sync",
+      "--emit-vpto"
+    ]
+  },
+  "case_count": 120,
+  "worktree": {
+    "dirty": false,
+    "status": [],
+    "source_sha256": {
+      "lib/PTO/Transforms/PTOInferVPTOVecScope.cpp": "8edff131985ca9cfc5056d88fc9d82cb2de5328919120eae80a59bc758bb3daf",
+      "lib/PTO/Transforms/PTOViewToMemref.cpp": "5bdaecd178b2073f8a7c5090fd5a4f78583627b526925fa6f930f693a3e9cc3f",
+      "lib/PTO/Transforms/PTOVmiLoopFusion.cpp": "704f7cf9d65f7bd2f5c7e9839afae9d5ee3dd7285daec1b8d384abb37b11fa65",
+      "lib/PTO/Transforms/PTOVmiLoadStoreElision.cpp": "ab08e10697bdd9ef66cd33e0dc745e3972b7a8ec82550afe278478491081da10"
+    }
+  }
+}

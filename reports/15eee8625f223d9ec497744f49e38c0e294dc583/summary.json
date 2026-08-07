@@ -1,0 +1,105 @@
+{
+  "ptoas_commit": "15eee8625f223d9ec497744f49e38c0e294dc583",
+  "run_manifest": {
+    "ptoas_worktree": "$PTO_WORKSPACE/_codex_worktrees/vmi-vbr-vecscope-clone",
+    "ptoas_commit": "15eee8625f223d9ec497744f49e38c0e294dc583",
+    "ptoas_binary": "$PTO_WORKSPACE/_codex_worktrees/vmi-vbr-vecscope-clone/build-llvm21/tools/ptoas/ptoas",
+    "dsv4_root": "$PTO_WORKSPACE/dsv4-vmi-lowering-lab/inputs/dsv4",
+    "variants": {
+      "fusion_off": [
+        "--pto-arch=a5",
+        "--pto-level=level3",
+        "--pto-backend=vpto",
+        "--tile-lib-backend=ptodsl",
+        "--enable-vmi",
+        "--enable-op-fusion=false",
+        "--enable-insert-sync",
+        "--emit-vpto"
+      ],
+      "fusion_on": [
+        "--pto-arch=a5",
+        "--pto-level=level3",
+        "--pto-backend=vpto",
+        "--tile-lib-backend=ptodsl",
+        "--enable-vmi",
+        "--enable-op-fusion",
+        "--enable-insert-sync",
+        "--emit-vpto"
+      ]
+    },
+    "case_count": 120,
+    "worktree": {
+      "dirty": false,
+      "status": [],
+      "source_sha256": {
+        "lib/PTO/Transforms/PTOInferVPTOVecScope.cpp": "8edff131985ca9cfc5056d88fc9d82cb2de5328919120eae80a59bc758bb3daf",
+        "lib/PTO/Transforms/PTOViewToMemref.cpp": "5bdaecd178b2073f8a7c5090fd5a4f78583627b526925fa6f930f693a3e9cc3f",
+        "lib/PTO/Transforms/PTOVmiLoopFusion.cpp": "704f7cf9d65f7bd2f5c7e9839afae9d5ee3dd7285daec1b8d384abb37b11fa65",
+        "lib/PTO/Transforms/PTOVmiLoadStoreElision.cpp": "ab08e10697bdd9ef66cd33e0dc745e3972b7a8ec82550afe278478491081da10"
+      }
+    }
+  },
+  "input_cases": 120,
+  "compile_status": {
+    "PASS": 120
+  },
+  "fusion_assessment": {
+    "hard_boundary_only": 48,
+    "fusion_candidate_with_local_boundaries": 43,
+    "fusion_candidate_clean": 29
+  },
+  "case_families": {
+    "_jit_attention_csa_test_20260723_032646": 47,
+    "_jit_prefill_attention_csa_test_20260723_031246": 53,
+    "_jit_qkv_proj_rope_test_20260723_031029": 9,
+    "_jit_qkv_proj_rope_test_20260723_031234": 9,
+    "_jit_rms_norm_test_20260723_030917": 1,
+    "_jit_rms_norm_test_20260723_030929": 1
+  },
+  "cases_with_residual_vmi_ops": 0,
+  "tileop_instances": 3280,
+  "tileop_kinds": 45,
+  "key_case_classification": {
+    "lowering_only": 2,
+    "deep_fusion_ready": 3,
+    "partially_optimized": 2,
+    "fragmented_or_unoptimized": 1
+  },
+  "key_case_optimization_totals": {
+    "loops_removed": 27,
+    "loads_elided": 29,
+    "stores_elided": 10
+  },
+  "sync_enabled_for_both_variants": true,
+  "fusion_phase_tileop_class": {
+    "hard_boundary": 1486,
+    "local_boundary": 720,
+    "vmi": 1029,
+    "unclassified": 53
+  },
+  "boundary_reasons": {
+    "non_vmi_hard_boundary_fallback": 1486,
+    "non_vmi_local_boundary_fallback": 720
+  },
+  "fusion_region_size_distribution": {
+    "1": 110,
+    "2": 50,
+    "3": 28,
+    "4": 17,
+    "5": 9,
+    "6": 24,
+    "7": 7,
+    "8": 12,
+    "10": 1,
+    "11": 6,
+    "12": 4,
+    "13": 1,
+    "14": 14
+  },
+  "fusion_region_summary": {
+    "regions": 283,
+    "singleton_regions": 110,
+    "singleton_ratio": 0.38869257950530034,
+    "selected_vmi_outside_regions": 0
+  }
+}

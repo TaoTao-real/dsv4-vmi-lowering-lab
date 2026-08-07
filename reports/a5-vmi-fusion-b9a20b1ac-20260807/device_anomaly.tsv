@@ -1,0 +1,3 @@
+case	variant	device	median_us	use_in_conclusion	note
+prefill_softmax	ordinary	1	1315.293	no	device-wide timing anomaly; diagnostic record only
+prefill_softmax	ordinary	7	99.490	yes	accepted serial sampling device

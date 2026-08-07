@@ -1,0 +1,16 @@
+key	value
+ptoas_commit	b9a20b1ace5727139b8cea873b2c789e6124fb6c
+ptoas_version	0.53
+target_soc	Ascend950PR_9599
+aicore_arch	dav-c310-vec
+cann_version	9.1.0-beta.3
+accepted_device	7
+cases	6
+variants	4
+repeats_per_variant	5
+samples	120
+execution_order	serial
+warmup	1 per case and variant
+measurement	measured kernel row in task_time CSV
+compiler_sync	--bisheng-vf-auto-sync=fused
+ptoas_sync	--enable-insert-sync

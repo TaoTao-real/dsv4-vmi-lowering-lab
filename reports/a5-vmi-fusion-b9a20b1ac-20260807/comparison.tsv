@@ -1,0 +1,7 @@
+case	ordinary_us	candidate_us	loop_us	fused_us	candidate_vs_ordinary_pct	loop_vs_candidate_pct	elision_vs_loop_pct	fused_vs_ordinary_pct	cross_variant_hash	vmi_coverage	acceptance
+decode_comb_sinkhorn	59.709	59.571	59.443	60.013	-0.23	-0.21	+0.96	+0.51	PASS	fallback_only	no_vmi_fusion_conclusion
+decode_rmsnorm	30.256	27.241	31.808	26.369	-9.96	+16.77	-17.10	-12.85	PASS	vmi_active	cross_variant_pass
+decode_rmsnorm_rope	11.600	11.312	12.054	10.709	-2.48	+6.56	-11.16	-7.68	MISMATCH	vmi_active	diagnostic_correctness_mismatch
+prefill_comb_sinkhorn	59.541	59.522	59.548	59.801	-0.03	+0.04	+0.42	+0.44	PASS	fallback_only	no_vmi_fusion_conclusion
+prefill_rope	87.832	93.322	91.003	80.665	+6.25	-2.48	-11.36	-8.16	PASS	vmi_active	cross_variant_pass
+prefill_softmax	99.490	101.753	101.698	99.646	+2.27	-0.05	-2.02	+0.16	PASS	vmi_active	cross_variant_pass

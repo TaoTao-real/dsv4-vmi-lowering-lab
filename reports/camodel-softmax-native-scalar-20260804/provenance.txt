@@ -1,0 +1,12 @@
+classification=current-source-softmax-candidate-and-fusion-comparison
+ptoas_base_commit=745b392f1
+kernel=test/vpto/cases/vmi/fa-softmax-dn-init/kernel.pto
+shape=128x64xf32
+cann_version=9.0.0
+camodel_soc=Ascend950PR_9599
+samples_per_mode=10
+ordinary_mode=ordinary PTODSL/VPTO candidates, VMI fusion disabled
+vmi_base_mode=VMI candidates, --enable-op-fusion=false
+vmi_fused_mode=VMI candidates, --enable-op-fusion=true
+correctness=all output files byte-equal across modes and historical accepted output
+note=full-mask vector-scalar VMI ops lower directly to native VPTO scalar ops; partial masks retain broadcast fallback

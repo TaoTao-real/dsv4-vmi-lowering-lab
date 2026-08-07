@@ -8,23 +8,24 @@ from pathlib import Path
 
 
 REPO = Path(__file__).resolve().parents[1]
+WORKSPACE = REPO.parent
 PTOAS_WORKTREE = Path(os.environ.get(
-    "PTOAS_WORKTREE", "/Users/lishengtao/Documents/PTO/PTOAS_vmi_vf_next"
+    "PTOAS_WORKTREE", str(WORKSPACE / "PTOAS_vmi_vf_next")
 ))
 DSV4_ROOT = Path(os.environ.get(
     "DSV4_ROOT",
-    "/Users/lishengtao/Documents/PTO/_ptoas_tech_lab_materials/datasets/dsv4/build_output",
+    str(REPO / "inputs/dsv4"),
 ))
 PTOAS = Path(os.environ.get(
     "PTOAS_BIN", str(PTOAS_WORKTREE / "build-llvm21/tools/ptoas/ptoas")
 ))
 PTODSL_PYTHON = Path(os.environ.get(
     "PTODSL_PYTHON",
-    "/Users/lishengtao/Documents/PTO/llvm-workspace/.venv-llvm21/bin/python",
+    str(WORKSPACE / "llvm-workspace/.venv-llvm21/bin/python"),
 ))
 MLIR_PYTHON_ROOT = Path(os.environ.get(
     "MLIR_PYTHON_ROOT",
-    "/Users/lishengtao/Documents/PTO/llvm-workspace/llvm-project-21/build-shared/tools/mlir/python_packages/mlir_core",
+    str(WORKSPACE / "llvm-workspace/llvm-project-21/build-shared/tools/mlir/python_packages/mlir_core"),
 ))
 
 KEY_PASSES = (
@@ -76,4 +77,3 @@ def sha256(path: Path) -> str:
         for chunk in iter(lambda: stream.read(1024 * 1024), b""):
             digest.update(chunk)
     return digest.hexdigest()
-

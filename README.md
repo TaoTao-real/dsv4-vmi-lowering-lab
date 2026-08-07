@@ -1,8 +1,7 @@
 # DSv4 VMI Lowering Lab
 
-This repository keeps reproducible DSv4 TileLib lowering artifacts and reports
-for VMI VF Fusion development. It intentionally does not copy the DSv4 source
-dataset or PTOAS source tree.
+This repository keeps reproducible DSv4 TileLib lowering inputs, artifacts, and
+reports for VMI VF Fusion development. It does not copy the PTOAS source tree.
 
 ## Scope
 
@@ -18,6 +17,7 @@ dataset or PTOAS source tree.
 ## Repository Layout
 
 ```text
+inputs/dsv4/                checked-in DSv4 PTO compiler inputs
 manifests/                  input provenance and case lists
 scripts/                    reproducible export and analysis tools
 artifacts/<ptoas-commit>/
@@ -25,17 +25,25 @@ artifacts/<ptoas-commit>/
   key-cases/                fusion-off and phase snapshots
   results.tsv               per-case compilation results
 reports/<ptoas-commit>/     machine-readable and Markdown analysis
+docs/progress/              stage reports and milestone acceptance gates
 ```
 
-The reusable input snapshot remains outside this repository:
+The 120 PTO inputs used by the checked-in reports are available directly under
+`inputs/dsv4/`. Verify them against the baseline manifest before reproducing a
+run:
 
-```text
-/Users/lishengtao/Documents/PTO/_ptoas_tech_lab_materials/datasets/dsv4/build_output
+```bash
+python3 scripts/verify_inputs.py
 ```
+
+Set `DSV4_ROOT=/path/to/build_output` only when intentionally evaluating a
+different generated snapshot. The export command records hashes for that run,
+so results from different snapshots remain distinguishable.
 
 ## Reproduce
 
 ```bash
+python3 scripts/verify_inputs.py
 python3 scripts/export_lowering.py
 python3 scripts/analyze_lowering.py
 python3 scripts/verify_artifacts.py
@@ -82,6 +90,16 @@ snapshot, while deep fusion is not. The immediate target is to aggregate
 dependent VMI TileOps into multi-op regions and reduce local fallback inside
 the vector compute chain. See `reports/<commit>/summary.md` for the detailed
 evidence.
+
+Current tracking material:
+
+- [`docs/progress/2026-08-03-stage2-progress.md`](docs/progress/2026-08-03-stage2-progress.md)
+- [`docs/progress/milestone-plan.md`](docs/progress/milestone-plan.md)
+- [`docs/progress/performance-sampling-plan.md`](docs/progress/performance-sampling-plan.md)
+- [`docs/progress/2026-08-04-static-and-performance-results.md`](docs/progress/2026-08-04-static-and-performance-results.md)
+- [`manifests/performance_cases.tsv`](manifests/performance_cases.tsv)
+- [`reports/performance_baseline_20260803.tsv`](reports/performance_baseline_20260803.tsv)
+- [`reports/camodel-repeats-20260804-serial-r10/report.md`](reports/camodel-repeats-20260804-serial-r10/report.md)
 
 The eight key-case controls are diagnostic only: 7/8 fusion-off controls pass;
 the `rmsnorm_rope` fusion-off control independently fails at VPTO emission

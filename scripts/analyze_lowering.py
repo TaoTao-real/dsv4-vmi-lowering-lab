@@ -120,6 +120,8 @@ def analyze(commit: str) -> None:
     artifact_root = REPO / "artifacts" / commit
     report_root = REPO / "reports" / commit
     report_root.mkdir(parents=True, exist_ok=True)
+    manifest_path = artifact_root / "run_manifest.json"
+    manifest = json.loads(manifest_path.read_text()) if manifest_path.exists() else {}
 
     compile_rows = []
     results_file = artifact_root / "results.tsv"
@@ -171,7 +173,9 @@ def analyze(commit: str) -> None:
 
     if full_rows:
         with (report_root / "case_lowering_status.tsv").open("w", newline="") as stream:
-            writer = csv.DictWriter(stream, fieldnames=list(full_rows[0]), delimiter="\t")
+            writer = csv.DictWriter(
+                stream, fieldnames=list(full_rows[0]), delimiter="\t", lineterminator="\n"
+            )
             writer.writeheader()
             writer.writerows(full_rows)
 
@@ -237,7 +241,9 @@ def analyze(commit: str) -> None:
 
     if key_rows:
         with (report_root / "key_case_fusion_metrics.tsv").open("w", newline="") as stream:
-            writer = csv.DictWriter(stream, fieldnames=list(key_rows[0]), delimiter="\t")
+            writer = csv.DictWriter(
+                stream, fieldnames=list(key_rows[0]), delimiter="\t", lineterminator="\n"
+            )
             writer.writeheader()
             writer.writerows(key_rows)
 
@@ -255,6 +261,7 @@ def analyze(commit: str) -> None:
     family_cases = Counter(Path(row["case"]).parts[0] for row in compile_rows)
     summary = {
         "ptoas_commit": commit,
+        "run_manifest": manifest,
         "input_cases": len(list(DSV4_ROOT.glob("**/*.pto"))),
         "compile_status": dict(compile_status),
         "fusion_assessment": dict(assessments),
@@ -277,6 +284,15 @@ def analyze(commit: str) -> None:
 
     lines = [
         f"# DSv4 VMI Lowering and Fusion Readiness ({commit[:12]})",
+        "",
+        "## Provenance",
+        "",
+        f"- PTOAS commit: `{commit}`",
+        f"- PTOAS worktree dirty at export: "
+        f"`{manifest.get('worktree', {}).get('dirty', 'unknown')}`",
+        f"- Compiler: `{manifest.get('ptoas_binary', 'unknown')}`",
+        "- Exact worktree status and key source hashes are recorded in "
+        "`run_manifest.json`; a dirty export must not be attributed to the pure commit.",
         "",
         "## Lowering Coverage",
         "",
@@ -338,8 +354,12 @@ def analyze(commit: str) -> None:
         "- `fragmented_or_unoptimized` reaches VMI/VPTO but does not yet demonstrate useful deep fusion.",
         "- Hard boundaries are expected around MTE/Cube/communication operations. Local boundaries inside a vector compute chain are optimization gaps.",
         "- Final VPTO must contain zero VMI operations; `pto.vmi.fusion.*` attributes are provenance and are not residual operations.",
-        "- All current FusionRegions are single-op regions, so VMI Loop Fusion has no multi-op region to merge in the measured key chains.",
-        "- The first optimization priority is region aggregation and local-boundary reduction in Softmax/RMSNorm chains; only then can Loop Fusion and Mem2Reg show their intended effect.",
+        f"- Singleton regions account for "
+        f"{(100.0 * singleton_regions / total_regions) if total_regions else 0.0:.1f}% "
+        "of current regions; larger regions are available to Loop Fusion, while singleton "
+        "and region-external VMI units still expose aggregation gaps.",
+        "- Prioritize local-boundary reduction and the code shape of fused wide-vreg "
+        "chains; region aggregation alone does not guarantee a runtime speedup.",
         "",
     ))
     (report_root / "summary.md").write_text("\n".join(lines))

@@ -1,0 +1,9 @@
+classification=historical-object-repeat-sampling
+remote_host_profile=a3-camodel-shared
+remote_root_profile=A3_CAMODEL_ROOT
+repeats=10
+note=Remote binaries were built on 2026-08-03 and do not represent a newly rebuilt current PTOAS object.
+core_fusion_source_match=PTOVmiLoopFusion.cpp and PTOVmiLoadStoreElision.cpp SHA256 match local 7d299080 worktree.
+known_source_difference=PTOInferVPTOVecScope.cpp differs because the local worktree contains an uncommitted Vbr cloneability fix.
+runtime_input_archive=not-preserved-in-this-repository
+runtime_input_note=The checked-in inputs/dsv4 PTO files reproduce lowering, but the remote historical harness and its numerical fixtures are required to replay these 80 Camodel samples exactly.

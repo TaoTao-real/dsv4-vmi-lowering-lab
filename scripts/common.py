@@ -43,7 +43,12 @@ def git_commit() -> str:
     ).strip()
 
 
-def compiler_command(input_path: Path, output_path: Path, fusion: bool) -> list[str]:
+def compiler_command(
+    input_path: Path,
+    output_path: Path,
+    fusion: bool,
+    insert_sync: bool = False,
+) -> list[str]:
     command = [
         str(PTOAS),
         "--pto-arch=a5",
@@ -57,8 +62,26 @@ def compiler_command(input_path: Path, output_path: Path, fusion: bool) -> list[
         command.extend(("--enable-vmi", "--enable-op-fusion"))
     else:
         command.extend(("--enable-vmi", "--enable-op-fusion=false"))
+    if insert_sync:
+        command.append("--enable-insert-sync")
     command.extend(("--emit-vpto", str(input_path), "-o", str(output_path)))
     return command
+
+
+def compiler_flags(fusion: bool, insert_sync: bool = False) -> list[str]:
+    """Return the behavior-affecting flags recorded in experiment manifests."""
+    flags = [
+        "--pto-arch=a5",
+        "--pto-level=level3",
+        "--pto-backend=vpto",
+        "--tile-lib-backend=ptodsl",
+        "--enable-vmi",
+        "--enable-op-fusion" if fusion else "--enable-op-fusion=false",
+    ]
+    if insert_sync:
+        flags.append("--enable-insert-sync")
+    flags.append("--emit-vpto")
+    return flags
 
 
 def command_env() -> dict[str, str]:

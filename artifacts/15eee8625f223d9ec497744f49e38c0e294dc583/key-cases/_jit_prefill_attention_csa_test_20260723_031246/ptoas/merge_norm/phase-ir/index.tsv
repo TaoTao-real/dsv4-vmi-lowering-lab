@@ -1,0 +1,6 @@
+ordinal	phase	pass_name	pass_arg	file
+1	After	PTOFusionRegionGen	pto-fusion-region-gen	0001-after-pto-fusion-region-gen.mlir
+2	After	PTOFusionRegionGen	pto-fusion-region-gen	0002-after-pto-fusion-region-gen.mlir
+3	Before	PTOVmiLoopFusion	pto-vmi-loop-fusion	0003-before-pto-vmi-loop-fusion.mlir
+4	After	PTOVmiLoopFusion	pto-vmi-loop-fusion	0004-after-pto-vmi-loop-fusion.mlir
+5	After	PTOVmiLoadStoreElision	pto-vmi-load-store-elision	0005-after-pto-vmi-load-store-elision.mlir

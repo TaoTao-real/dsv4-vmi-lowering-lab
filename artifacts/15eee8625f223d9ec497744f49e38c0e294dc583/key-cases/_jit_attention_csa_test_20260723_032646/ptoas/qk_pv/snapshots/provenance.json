@@ -1,0 +1,18 @@
+{
+  "after-fusion-region-gen.mlir": [
+    "phase-ir/0001-after-pto-fusion-region-gen.mlir",
+    "phase-ir/0003-after-pto-fusion-region-gen.mlir"
+  ],
+  "before-vmi-loop-fusion.mlir": [
+    "phase-ir/0005-before-pto-vmi-loop-fusion.mlir",
+    "phase-ir/0008-before-pto-vmi-loop-fusion.mlir"
+  ],
+  "after-vmi-loop-fusion.mlir": [
+    "phase-ir/0006-after-pto-vmi-loop-fusion.mlir",
+    "phase-ir/0009-after-pto-vmi-loop-fusion.mlir"
+  ],
+  "after-vmi-load-store-elision.mlir": [
+    "phase-ir/0007-after-pto-vmi-load-store-elision.mlir",
+    "phase-ir/0010-after-pto-vmi-load-store-elision.mlir"
+  ]
+}

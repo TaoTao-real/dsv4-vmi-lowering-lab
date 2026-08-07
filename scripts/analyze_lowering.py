@@ -28,6 +28,20 @@ def count(pattern: re.Pattern[str], text: str) -> int:
 
 
 def phase_text(case_root: Path, pass_name: str, when: str = "After") -> str | None:
+    aliases = {
+        ("pto-fusion-region-gen", "After"): "after-fusion-region-gen.mlir",
+        ("pto-vmi-loop-fusion", "Before"): "before-vmi-loop-fusion.mlir",
+        ("pto-vmi-loop-fusion", "After"): "after-vmi-loop-fusion.mlir",
+        (
+            "pto-vmi-load-store-elision",
+            "After",
+        ): "after-vmi-load-store-elision.mlir",
+    }
+    alias = aliases.get((pass_name, when))
+    if alias:
+        snapshot = case_root / "snapshots" / alias
+        if snapshot.exists():
+            return snapshot.read_text(errors="replace")
     matches = list((case_root / "phase-ir").glob(f"**/*{pass_name}.mlir"))
     selected = []
     for path in matches:
@@ -259,6 +273,16 @@ def analyze(commit: str) -> None:
         size * instances for size, instances in region_sizes.items()
     ))
     family_cases = Counter(Path(row["case"]).parts[0] for row in compile_rows)
+    key_totals = {
+        "loops_removed": sum(row["loops_removed"] for row in key_rows),
+        "loads_elided": sum(row["loads_elided"] for row in key_rows),
+        "stores_elided": sum(row["stores_elided"] for row in key_rows),
+    }
+    variants = manifest.get("variants", {})
+    sync_enabled_for_both = all(
+        "--enable-insert-sync" in variants.get(name, [])
+        for name in ("fusion_off", "fusion_on")
+    )
     summary = {
         "ptoas_commit": commit,
         "run_manifest": manifest,
@@ -270,6 +294,8 @@ def analyze(commit: str) -> None:
         "tileop_instances": sum(op_counts.values()),
         "tileop_kinds": len(op_counts),
         "key_case_classification": dict(Counter(row["classification"] for row in key_rows)),
+        "key_case_optimization_totals": key_totals,
+        "sync_enabled_for_both_variants": sync_enabled_for_both,
         "fusion_phase_tileop_class": dict(class_totals),
         "boundary_reasons": dict(boundary_reasons),
         "fusion_region_size_distribution": dict(sorted(region_sizes.items())),
@@ -293,6 +319,20 @@ def analyze(commit: str) -> None:
         f"- Compiler: `{manifest.get('ptoas_binary', 'unknown')}`",
         "- Exact worktree status and key source hashes are recorded in "
         "`run_manifest.json`; a dirty export must not be attributed to the pure commit.",
+        "",
+        "## Synchronization And Capture Contract",
+        "",
+        f"- Fusion OFF and ON both enable PTOAS synchronization insertion: "
+        f"`{sync_enabled_for_both}`.",
+        "- Key pass dumps are extracted from the ordered compiler log, deduplicated "
+        "by content, and aggregated into stable canonical snapshots. This preserves "
+        "both anonymous AIC/AIV modules after `VPTOSplitCVModule`.",
+        "- A strict Prefill RoPE sync OFF/ON control at `67283e5e5039` produced "
+        "identical normalized-snapshot SHA-256 hashes after both "
+        "`InsertTemplateAttributes` (`f83f7726...`) and "
+        "`SelectTemplateCandidate` (`1b26f116...`). Therefore "
+        "synchronization does not remove VMI candidates; candidate differences come "
+        "from form/shape/valid-shape eligibility.",
         "",
         "## Lowering Coverage",
         "",
@@ -332,6 +372,10 @@ def analyze(commit: str) -> None:
     lines.extend((
         "",
         "## Key Fusion Metrics",
+        "",
+        f"Across the eight key cases, Loop Fusion removes {key_totals['loops_removed']} "
+        f"loops and Mem2Reg removes {key_totals['loads_elided']} VMI loads plus "
+        f"{key_totals['stores_elided']} VMI stores.",
         "",
         "| Case | Regions | VMI instances | Local | Hard | Loops after fusion | Loads elided | Stores elided | Assessment |",
         "|---|---:|---:|---:|---:|---:|---:|---:|---|",

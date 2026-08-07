@@ -44,14 +44,18 @@ so results from different snapshots remain distinguishable.
 
 ```bash
 python3 scripts/verify_inputs.py
-python3 scripts/export_lowering.py
-python3 scripts/analyze_lowering.py
-python3 scripts/verify_artifacts.py
+env PTOAS_WORKTREE=/path/to/clean/PTOAS \
+  PTOAS_BIN=/path/to/clean/PTOAS/build-llvm21/tools/ptoas/ptoas \
+  PTODSL_PYTHON=/path/to/python \
+  MLIR_PYTHON_ROOT=/path/to/mlir_core \
+  python3 scripts/export_lowering.py --all --keys --insert-sync
+python3 scripts/analyze_lowering.py --commit <ptoas-commit>
+python3 scripts/verify_artifacts.py --commit <ptoas-commit>
 ```
 
-The defaults target the local PTOAS VMI VF Fusion worktree. Every generated
-manifest records the exact compiler commit, command-line flags, input hashes,
-and output paths.
+Run the heavy cases serially. `--resume` reuses only completed Fusion OFF
+controls and completed full-case outputs. Every generated manifest records the
+exact compiler commit, command-line flags, input hashes, and output paths.
 
 ## Interpretation
 
@@ -75,21 +79,23 @@ phase snapshots of the fusion-on run.
 ## Current Baseline
 
 The checked-in baseline is keyed by PTOAS commit
-`533887b4ae09635e9c7ddb5db7d7bf29c12f8347`:
+`15eee8625f223d9ec497744f49e38c0e294dc583`:
 
 - 120/120 real DSv4 PTO inputs reach final VPTO;
+- the serial full run completes without timeout or confirmed failure;
 - final VPTO contains no residual `pto.vmi` operation;
-- 1100 TileOp instances select a VMI candidate at FusionRegionGen;
-- 649 instances use local fallback and 1486 use expected hard-boundary fallback;
-- all 1056 generated FusionRegions currently contain exactly one VMI TileOp;
-- the eight key FA/Softmax/RMSNorm/RoPE chains remove no loops, five VMI loads,
-  and no VMI stores in total.
+- 1029 TileOp instances select a VMI candidate at FusionRegionGen;
+- 720 instances use local fallback and 1486 use expected hard-boundary fallback;
+- 283 FusionRegions are generated; 110 are singleton regions (38.9%);
+- the eight key FA/Softmax/RMSNorm/RoPE chains remove 27 loops, 29 VMI loads,
+  and 10 VMI stores in total.
 
-This means lowering coverage and VMIToVPTO closure are complete for the input
-snapshot, while deep fusion is not. The immediate target is to aggregate
-dependent VMI TileOps into multi-op regions and reduce local fallback inside
-the vector compute chain. See `reports/<commit>/summary.md` for the detailed
-evidence.
+This means lowering coverage, Region aggregation, Loop Fusion, Mem2Reg, and
+VMIToVPTO closure are all active. The optimization is still uneven: Softmax,
+RMSNorm, and RMSNorm+RoPE show concrete loop and memory reduction, while
+`comb_sinkhorn` and Prefill RoPE remain local-fallback-only and Gather KV has
+no measurable loop or memory elimination. See `reports/<commit>/summary.md`
+for the detailed evidence.
 
 Current tracking material:
 
@@ -101,8 +107,7 @@ Current tracking material:
 - [`reports/performance_baseline_20260803.tsv`](reports/performance_baseline_20260803.tsv)
 - [`reports/camodel-repeats-20260804-serial-r10/report.md`](reports/camodel-repeats-20260804-serial-r10/report.md)
 
-The eight key-case controls are diagnostic only: 7/8 fusion-off controls pass;
-the `rmsnorm_rope` fusion-off control independently fails at VPTO emission
-because the legacy path exposes a vector-scope value to an external user. The
-fusion-on phase snapshots for that case pass and are the source of its fusion
-metrics. This is why the control is not used as a performance baseline.
+The eight key-case Fusion OFF controls and all eight Fusion ON phase exports
+pass on this baseline. These controls are structural diagnostics, not camodel
+performance acceptance; numerical golden and identical-runtime-option gates
+remain separate.

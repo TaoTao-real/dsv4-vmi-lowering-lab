@@ -1,0 +1,72 @@
+{
+  "schema_version": 1,
+  "cases": {
+    "prefill_softmax": {
+      "pto": "inputs/dsv4/_jit_prefill_attention_csa_test_20260723_031246/ptoas/prefill_c4_softmax_pool.pto",
+      "kernel": "prefill_c4_softmax_pool",
+      "scalar_overrides": {
+        "v10": 128,
+        "v11": 0,
+        "v12": 64
+      },
+      "model_script": "models/deepseek/v4/prefill_attention_csa.py",
+      "model_args": ["--start-pos", "0", "--num-tokens", "128"],
+      "notes": "Scalar values mirror num_tokens=128 and the first of 64 SPMD blocks."
+    },
+    "prefill_rope": {
+      "pto": "inputs/dsv4/_jit_prefill_attention_csa_test_20260723_031246/ptoas/rope.pto",
+      "kernel": "rope",
+      "scalar_overrides": {
+        "v5": 0,
+        "v6": 32
+      },
+      "model_script": "models/deepseek/v4/prefill_attention_csa.py",
+      "model_args": ["--start-pos", "0", "--num-tokens", "128"],
+      "notes": "Scalar values mirror the first of 32 SPMD blocks."
+    },
+    "decode_rmsnorm_rope": {
+      "pto": "inputs/dsv4/_jit_attention_csa_test_20260723_032646/ptoas/rmsnorm_rope.pto",
+      "kernel": "rmsnorm_rope",
+      "scalar_overrides": {},
+      "model_script": "models/deepseek/v4/decode_attention_csa.py",
+      "model_args": [],
+      "notes": "The kernel has no scalar or implicit SPMD arguments."
+    },
+    "decode_rmsnorm": {
+      "pto": "inputs/dsv4/_jit_rms_norm_test_20260723_030917/ptoas/rms_norm.pto",
+      "kernel": "rms_norm",
+      "scalar_overrides": {
+        "v4": 8,
+        "v5": 0,
+        "v6": 1
+      },
+      "model_script": "models/deepseek/v4/rmsnorm.py",
+      "model_args": ["--mode", "decode"],
+      "notes": "Standalone DSv4 RMSNorm for the decode shape T=8, D=4096."
+    },
+    "decode_comb_sinkhorn": {
+      "pto": "inputs/dsv4/_jit_attention_csa_test_20260723_032646/ptoas/comb_sinkhorn.pto",
+      "kernel": "comb_sinkhorn",
+      "scalar_overrides": {
+        "v6": 8,
+        "v7": 0,
+        "v8": 1
+      },
+      "model_script": "models/deepseek/v4/decode_attention_csa.py",
+      "model_args": [],
+      "notes": "Measures the single decode Sinkhorn tile for t_dim=8."
+    },
+    "prefill_comb_sinkhorn": {
+      "pto": "inputs/dsv4/_jit_prefill_attention_csa_test_20260723_031246/ptoas/comb_sinkhorn.pto",
+      "kernel": "comb_sinkhorn",
+      "scalar_overrides": {
+        "v6": 128,
+        "v7": 0,
+        "v8": 16
+      },
+      "model_script": "models/deepseek/v4/prefill_attention_csa.py",
+      "model_args": ["--start-pos", "0", "--num-tokens", "128"],
+      "notes": "Measures one of 16 prefill Sinkhorn SPMD blocks for t_dim=128."
+    }
+  }
+}

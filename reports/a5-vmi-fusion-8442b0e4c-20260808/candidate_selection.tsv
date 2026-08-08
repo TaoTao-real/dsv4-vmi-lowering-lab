@@ -1,0 +1,3 @@
+case	selected_vmi_candidates	local_boundaries	hard_boundaries	final_candidate_provenance	selection_evidence
+decode_comb_sinkhorn	108	0	21	0	artifacts/8442b0e4c-a5-vf-sampling/decode_comb_sinkhorn/selection-dump.mlir
+prefill_comb_sinkhorn	108	0	21	0	artifacts/8442b0e4c-a5-vf-sampling/prefill_comb_sinkhorn/selection-dump.mlir

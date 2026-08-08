@@ -31,20 +31,31 @@ def load_static_metrics(path: Path) -> dict[tuple[str, str], dict[str, str]]:
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Validate and summarize the b9a20b1ac A5 A/B/C/D samples."
+        description="Validate and summarize serial A5 A/B/C/D samples."
     )
     parser.add_argument("report_dir", type=Path)
+    parser.add_argument(
+        "--expected-case",
+        action="append",
+        default=[],
+        help="expected case name; repeat for each case (defaults to the original six-case set)",
+    )
     args = parser.parse_args()
+
+    expected_cases = set(args.expected_case) or EXPECTED_CASES
+    expected_samples = len(expected_cases) * len(VARIANTS) * 5
 
     samples_path = args.report_dir / "samples.tsv"
     with samples_path.open(newline="") as stream:
         rows = list(csv.DictReader(stream, delimiter="\t"))
 
-    if len(rows) != 120:
-        raise SystemExit(f"expected 120 samples, found {len(rows)}")
+    if len(rows) != expected_samples:
+        raise SystemExit(
+            f"expected {expected_samples} samples, found {len(rows)}"
+        )
     cases = {row["case"] for row in rows}
     variants = {row["variant"] for row in rows}
-    if cases != EXPECTED_CASES:
+    if cases != expected_cases:
         raise SystemExit(f"unexpected case set: {sorted(cases)}")
     if variants != set(VARIANTS):
         raise SystemExit(f"unexpected variant set: {sorted(variants)}")
@@ -130,7 +141,12 @@ def main() -> None:
             items = [by_key[(case, variant)] for variant in VARIANTS]
             medians = [float(item["median_us"]) for item in items]
             hashes = {digest for item in items for digest in item["hashes"]}
-            candidate_count = int(static[(case, "vmi_candidate")]["vmi_candidates"])
+            candidate_metrics = static[(case, "vmi_candidate")]
+            candidate_count = int(
+                candidate_metrics.get(
+                    "selected_vmi_candidates", candidate_metrics["vmi_candidates"]
+                )
+            )
             if candidate_count == 0:
                 coverage = "fallback_only"
                 acceptance = "no_vmi_fusion_conclusion"
@@ -186,7 +202,10 @@ def main() -> None:
                 }
             )
 
-    print("validated 120 samples (6 cases x 4 variants x 5 repeats)")
+    print(
+        f"validated {len(rows)} samples "
+        f"({len(cases)} cases x {len(VARIANTS)} variants x 5 repeats)"
+    )
     print(f"wrote {args.report_dir / 'summary.tsv'}")
     print(f"wrote {args.report_dir / 'comparison.tsv'}")
     print(f"wrote {args.report_dir / 'run_manifest.tsv'}")

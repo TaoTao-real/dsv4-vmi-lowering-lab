@@ -101,6 +101,7 @@ Current tracking material:
 - [`reports/performance_baseline_20260803.tsv`](reports/performance_baseline_20260803.tsv)
 - [`reports/camodel-repeats-20260804-serial-r10/report.md`](reports/camodel-repeats-20260804-serial-r10/report.md)
 - [`reports/a5-vmi-fusion-b9a20b1ac-20260807/report.md`](reports/a5-vmi-fusion-b9a20b1ac-20260807/report.md)
+- [`reports/a5-vmi-fusion-8442b0e4c-20260808/report.md`](reports/a5-vmi-fusion-8442b0e4c-20260808/report.md)
 
 The eight key-case controls are diagnostic only: 7/8 fusion-off controls pass;
 the `rmsnorm_rope` fusion-off control independently fails at VPTO emission
